@@ -1,0 +1,1802 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ============================================================
+   VA 音乐情感标注台 · 设计令牌
+   ============================================================ */
+#va-app{
+  --bg:#070910; --surface:#0b0e16; --surface-2:#10141e; --surface-3:#161b27; --well:#080b12;
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.13); --line-3:rgba(255,255,255,.045);
+  --txt:#eef2fa; --txt-2:#9aa5ba; --txt-3:#5f6b82; --txt-4:#3f4859;
+  --ac:#8b5cf6; --ac-2:#3b82f6; --ac-soft:rgba(139,92,246,.14);
+  --grad:linear-gradient(135deg,#8b5cf6 0%,#6366f1 45%,#3b82f6 100%);
+  --good:#3ddc97; --warn:#fbbf24; --bad:#fb6c7d; --info:#38bdf8;
+  --hi:255,255,255;
+  --btn-fg:#c9d1e2; --btn-hover:#1d2333; --btn-hover-fg:#ffffff;
+  --ctl-fg:#cfd6e6; --ctl-hover:#212839; --kbd-bg:rgba(255,255,255,.16);
+  --menu-bg:rgba(20,25,36,.96); --menu-fg:#cfd6e6;
+  --drawer-bg:#0c1018; --modal-bg:#0d1119; --toast-bg:rgba(26,32,46,.97); --scrim:rgba(4,6,10,.62);
+  --sb:#242c3d; --sb-h:#3a4459; --tag-fg:#c4b5fd; --key-fg:#dbe2f0;
+  --tile-live:#ffffff; --tile-mark:#ffffff; --thumb-bg:#ffffff; --range-track:rgba(255,255,255,.1);
+  --well-inset:inset 0 2px 10px rgba(0,0,0,.45);
+  --decor-1:rgba(139,92,246,.13); --decor-2:rgba(59,130,246,.11); --decor-3:rgba(255,255,255,.018);
+  --cv-bg:#0a0d14;
+  --r-xs:7px; --r-sm:10px; --r-md:14px; --r-lg:18px; --r-pill:99px;
+  --sh-1:0 1px 2px rgba(0,0,0,.45);
+  --sh-2:0 8px 24px -12px rgba(0,0,0,.8);
+  --sh-3:0 28px 70px -24px rgba(0,0,0,.9);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+
+/* ============ 浅色主题（白色） ============ */
+#va-app[data-theme="light"]{
+  --bg:#f1f4f9; --surface:#ffffff; --surface-2:#f7f8fc; --surface-3:#ecf0f7; --well:#f4f6fa;
+  --line:rgba(15,23,42,.11); --line-2:rgba(15,23,42,.18); --line-3:rgba(15,23,42,.07);
+  --txt:#0f172a; --txt-2:#475569; --txt-3:#64748b; --txt-4:#94a3b8;
+  --ac:#7c5cf7; --ac-2:#2563eb; --ac-soft:rgba(124,92,247,.13);
+  --grad:linear-gradient(135deg,#8b5cf6 0%,#6366f1 45%,#3b82f6 100%);
+  --good:#0f9d63; --warn:#b45309; --bad:#dc2626; --info:#0284c7;
+  --hi:15,23,42;
+  --btn-fg:#334155; --btn-hover:#e9ecf3; --btn-hover-fg:#0f172a;
+  --ctl-fg:#334155; --ctl-hover:#e9ecf3; --kbd-bg:rgba(15,23,42,.10);
+  --menu-bg:rgba(255,255,255,.98); --menu-fg:#334155;
+  --drawer-bg:#ffffff; --modal-bg:#ffffff; --toast-bg:rgba(255,255,255,.98); --scrim:rgba(15,23,42,.38);
+  --sb:#cbd5e1; --sb-h:#94a3b8; --tag-fg:#6d4ff0; --key-fg:#334155;
+  --tile-live:#0f172a; --tile-mark:#ffffff; --thumb-bg:#ffffff; --range-track:rgba(15,23,42,.12);
+  --well-inset:inset 0 1px 3px rgba(15,23,42,.08);
+  --decor-1:rgba(124,92,247,.10); --decor-2:rgba(37,99,235,.09); --decor-3:rgba(15,23,42,.03);
+  --cv-bg:#ffffff;
+  --sh-1:0 1px 2px rgba(15,23,42,.06);
+  --sh-2:0 6px 18px -10px rgba(15,23,42,.16);
+  --sh-3:0 28px 70px -24px rgba(15,23,42,.28);
+}
+#va-app[data-theme="light"] .va-warn{color:#92400e;border-bottom-color:rgba(180,83,9,.25);
+  background:linear-gradient(90deg,rgba(245,158,11,.2),rgba(245,158,11,.05));}
+#va-app[data-theme="light"] .va-btn.primary,
+#va-app[data-theme="light"] .va-drop,
+#va-app[data-theme="light"] .va-savebtn:not(:disabled){color:#fff;}
+
+#va-app{
+  position:relative; max-width:1440px; margin:0 auto;
+  height:calc(100vh - 12px); min-height:520px; box-sizing:border-box;
+  padding-bottom:var(--player-h,58px);   /* 给屏幕最底部的固定播放条留位，内容永不被挡 */
+  display:flex; flex-direction:column;
+  background:var(--bg); color:var(--txt);
+  border:1px solid var(--line); border-radius:20px; overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+  font-size:14px; line-height:1.5; letter-spacing:.01em;
+  box-shadow:var(--sh-3);
+  -webkit-font-smoothing:antialiased;
+}
+#va-app button,#va-app input,#va-app select,#va-app label,#va-app a{font-family:inherit;}
+#va-app button{cursor:pointer;border:none;background:none;color:inherit;}
+#va-app :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:var(--r-xs);}
+
+/* 背景装饰层 */
+.va-decor{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.va-decor::before,.va-decor::after{content:"";position:absolute;border-radius:50%;filter:blur(0.5px);}
+.va-decor::before{width:760px;height:760px;left:-220px;top:-320px;
+  background:radial-gradient(circle,var(--decor-1),transparent 66%);}
+.va-decor::after{width:700px;height:700px;right:-200px;bottom:-300px;
+  background:radial-gradient(circle,var(--decor-2),transparent 66%);}
+.va-decor i{position:absolute;inset:0;
+  background-image:linear-gradient(var(--decor-3) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--decor-3) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 78%);}
+#va-app>*:not(.va-bottom){position:relative;z-index:1;}
+#va-app>.va-top{z-index:20;}    /* 顶栏含导出菜单，必须压过内容区，否则菜单被挡 */
+#va-app>.va-warn{z-index:15;}
+
+/* ============================================================ 顶栏 */
+.va-top{display:flex;align-items:center;gap:16px;padding:12px 18px 11px;
+  background:linear-gradient(180deg,rgba(var(--hi),.038),rgba(var(--hi),.008)),var(--surface);
+  border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.va-brand{display:flex;align-items:center;gap:11px;min-width:0;}
+.va-mark{width:34px;height:34px;border-radius:11px;background:var(--grad);flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;letter-spacing:.5px;
+  color:#fff;box-shadow:0 6px 18px -6px rgba(139,92,246,.85),inset 0 1px 0 rgba(255,255,255,.35);}
+.va-brand h1{font-size:14.5px;font-weight:650;line-height:1.25;white-space:nowrap;}
+.va-brand p{font-size:11px;color:var(--txt-3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.va-rail{flex:1;min-width:130px;max-width:320px;height:6px;border-radius:var(--r-pill);
+  background:var(--well);border:1px solid var(--line);overflow:hidden;position:relative;}
+.va-rail i{display:block;height:100%;width:0;background:var(--grad);border-radius:var(--r-pill);
+  box-shadow:0 0 14px rgba(139,92,246,.7);transition:width .5s var(--ease-out);}
+.va-rail b{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:8.5px;font-weight:700;
+  color:var(--txt-3);font-variant-numeric:tabular-nums;}
+.va-topstats{display:flex;gap:8px;font-size:11.5px;color:var(--txt-3);flex-wrap:wrap;justify-content:flex-end;}
+.va-topstats span{display:inline-flex;gap:5px;align-items:center;background:var(--surface-3);
+  border:1px solid var(--line);border-radius:var(--r-pill);padding:3px 10px;white-space:nowrap;}
+.va-topstats b{color:var(--txt);font-weight:650;font-variant-numeric:tabular-nums;}
+.va-topactions{display:flex;gap:7px;margin-left:auto;align-items:center;position:relative;}
+
+/* 按钮体系 */
+.va-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--surface-3);border:1px solid var(--line-2);color:var(--btn-fg);
+  border-radius:var(--r-sm);padding:7px 12px;font-size:12.5px;font-weight:500;white-space:nowrap;
+  box-shadow:var(--sh-1),inset 0 1px 0 rgba(var(--hi),.05);
+  transition:background .16s var(--ease),color .16s,border-color .16s,transform .12s var(--ease),box-shadow .16s;}
+.va-btn:hover{background:var(--btn-hover);color:var(--btn-hover-fg);border-color:rgba(var(--hi),.22);}
+.va-btn:active{transform:translateY(1px);}
+.va-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.va-btn.primary{background:var(--grad);border-color:transparent;color:#fff;font-weight:650;
+  box-shadow:0 10px 26px -10px rgba(139,92,246,.9),inset 0 1px 0 rgba(255,255,255,.28);}
+.va-btn.primary:hover{filter:brightness(1.1);}
+.va-btn.tiny{padding:4px 9px;font-size:11.5px;border-radius:var(--r-xs);}
+.va-btn.ghost{background:transparent;border-color:var(--line);box-shadow:none;color:var(--txt-2);}
+.va-btn.ghost:hover{background:var(--surface-3);color:var(--txt);}
+.va-btn.bad{color:var(--bad);border-color:rgba(251,108,125,.28);}
+.va-btn.bad:hover{background:rgba(251,108,125,.12);color:#ff9aa6;border-color:rgba(251,108,125,.5);}
+.va-btn.block{width:100%;}
+.va-btn kbd{font-family:inherit;font-size:9.5px;font-weight:700;background:var(--kbd-bg);
+  border-radius:4px;padding:1px 5px;line-height:1.5;}
+
+/* 下拉菜单 */
+.va-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:196px;padding:5px;
+  background:var(--menu-bg);backdrop-filter:blur(14px);border:1px solid var(--line-2);
+  border-radius:var(--r-md);box-shadow:var(--sh-3);z-index:80;display:none;
+  animation:vaPop .16s var(--ease-out);}
+.va-menu.open{display:block;}
+.va-menu button{display:flex;width:100%;text-align:left;gap:9px;padding:8px 10px;border-radius:var(--r-xs);
+  font-size:12.5px;color:var(--menu-fg);transition:background .12s,color .12s;}
+.va-menu button:hover{background:var(--ac-soft);color:var(--txt);}
+.va-menu button small{display:block;font-size:10.5px;color:var(--txt-3);margin-top:1px;}
+.va-menu hr{border:none;border-top:1px solid var(--line);margin:5px 4px;}
+@keyframes vaPop{from{opacity:0;transform:translateY(-6px) scale(.98);}to{opacity:1;transform:none;}}
+
+/* 提示条 */
+.va-warn{background:linear-gradient(90deg,rgba(251,191,36,.16),rgba(251,191,36,.05));
+  color:#fcd34d;font-size:12px;padding:8px 18px;border-bottom:1px solid rgba(251,191,36,.22);}
+
+/* ============================================================ 主体 */
+.va-main{flex:1;min-height:0;display:grid;grid-template-columns:296px minmax(380px,1fr) 322px;gap:14px;padding:14px 16px;}
+.va-col{display:flex;flex-direction:column;gap:10px;min-height:0;}
+
+/* 面板卡片 */
+.va-panel{background:linear-gradient(180deg,rgba(var(--hi),.04),rgba(var(--hi),.01)),var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--sh-2),inset 0 1px 0 rgba(var(--hi),.05);}
+.va-panel>h3{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;letter-spacing:.06em;
+  color:var(--txt-2);text-transform:uppercase;padding:12px 14px 0;}
+.va-panel>h3 em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;color:var(--txt-4);font-size:11px;margin-left:auto;}
+.va-pad{padding:12px 14px 14px;}
+
+/* ---------- 左：曲库 ---------- */
+.va-drop{display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--grad);border-radius:var(--r-md);padding:13px 0;font-size:14px;font-weight:650;color:#fff;
+  letter-spacing:.04em;box-shadow:0 14px 32px -14px rgba(124,92,255,.95),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:filter .16s,transform .12s var(--ease);user-select:none;}
+.va-drop:hover{filter:brightness(1.12);}
+.va-drop:active{transform:translateY(1px);}
+.va-seg{display:flex;gap:3px;padding:3px;background:var(--well);border:1px solid var(--line);border-radius:var(--r-sm);}
+.va-seg button{flex:1;padding:5px 0;border-radius:var(--r-xs);font-size:11.5px;font-weight:550;color:var(--txt-3);
+  transition:background .15s var(--ease),color .15s;}
+.va-seg button:hover{color:var(--txt-2);}
+.va-seg button.on{background:var(--surface-3);color:var(--txt);box-shadow:var(--sh-1),inset 0 1px 0 rgba(var(--hi),.07);}
+.va-plhead{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--txt-3);padding:0 2px;}
+.va-plhead b{color:var(--txt);font-variant-numeric:tabular-nums;}
+.va-chk{display:inline-flex;align-items:center;gap:5px;cursor:pointer;margin-left:auto;white-space:nowrap;color:var(--txt-2);}
+.va-chk input{accent-color:var(--ac);cursor:pointer;}
+.va-playlist{flex:0 1 auto;min-height:90px;max-height:34%;overflow:auto;background:var(--well);border:1px solid var(--line);
+  border-radius:var(--r-md);box-shadow:var(--well-inset);}
+.va-empty{padding:34px 20px;text-align:center;color:var(--txt-4);font-size:12px;line-height:2.1;}
+.va-empty b{display:block;font-size:22px;margin-bottom:6px;opacity:.5;}
+.va-item{position:relative;padding:10px 52px 10px 13px;border-bottom:1px solid rgba(var(--hi),.05);
+  cursor:pointer;transition:background .14s var(--ease);}
+.va-item:hover{background:rgba(var(--hi),.035);}
+.va-item.cur{background:linear-gradient(90deg,var(--ac-soft),rgba(139,92,246,.02));}
+.va-item.cur::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;
+  background:var(--grad);box-shadow:0 0 12px rgba(139,92,246,.9);}
+.va-item.done{opacity:.72;}
+.va-item.done:hover,.va-item.cur{opacity:1;}
+.va-itemname{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;gap:7px;align-items:baseline;}
+.va-itemname i{font-style:normal;font-variant-numeric:tabular-nums;color:var(--txt-4);font-size:11px;flex:none;}
+.va-itemmeta{font-size:10.5px;color:var(--txt-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.va-item .va-badge{position:absolute;right:30px;top:50%;transform:translateY(-50%);
+  width:19px;height:19px;border-radius:50%;background:rgba(61,220,151,.14);color:var(--good);
+  border:1px solid rgba(61,220,151,.32);font-size:10px;display:flex;align-items:center;justify-content:center;}
+.va-item .va-del{position:absolute;right:6px;top:5px;width:17px;height:17px;padding:0;border-radius:50%;
+  border:1px solid var(--line-2);background:var(--surface-3);color:var(--txt-4);font-size:8px;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.45;
+  transition:opacity .14s,color .14s,border-color .14s,background .14s;}
+.va-item .va-del:hover{opacity:1;color:var(--bad);border-color:rgba(251,108,125,.5);background:rgba(251,108,125,.12);}
+.va-hint{font-size:10.5px;color:var(--txt-4);line-height:1.75;padding:0 2px;}
+.va-hint code{background:var(--surface-3);border-radius:4px;padding:1px 4px;font-size:10px;color:var(--txt-2);}
+
+/* ---------- 中：打分区 ---------- */
+.va-center{min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 4px 4px;}
+/* 右栏兜底：内容再高也只在栏内出滚动条，不会滑到播放条底下 */
+.va-col-scroll{overflow-y:auto;overflow-x:hidden;}
+.va-col-scroll>.va-panel{flex-shrink:0;}
+.va-now{width:min(100%,600px);text-align:center;}
+.va-nowtitle{font-size:19px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.va-nowtitle.placeholder{font-size:15px;font-weight:500;color:var(--txt-3);}
+.va-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.va-chip{font-size:10.5px;color:var(--txt-2);background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-pill);padding:2.5px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+.va-chip b{color:var(--txt);font-weight:600;font-variant-numeric:tabular-nums;}
+.va-vaspace{position:relative;width:min(100%,462px);padding:1px;border-radius:20px;box-sizing:border-box;background:linear-gradient(150deg,rgba(139,92,246,.5),rgba(59,130,246,.18) 40%,rgba(var(--hi),.06));
+  box-shadow:0 22px 54px -26px rgba(0,0,0,.95);}
+/* 纯 CSS 正方：padding-top:100% 撑高度——不依赖 aspect-ratio（旧 iOS 不支持），JS 未执行时画布也在 */
+.va-vaspace::before{content:"";display:block;padding-top:100%;}
+.va-vaspace.fixed::before{display:none;}   /* JS 写入显式尺寸时，不再需要 CSS 撑高度 */
+#vaCanvas{position:absolute;top:1px;left:1px;width:calc(100% - 2px);height:calc(100% - 2px);border-radius:19px;cursor:crosshair;touch-action:none;background:var(--cv-bg);}
+
+.va-quadline{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--txt-3);text-align:center;min-height:20px;
+  flex-wrap:wrap;justify-content:center;}
+.va-quadline .qdot{width:8px;height:8px;border-radius:50%;background:var(--txt-4);transition:background .2s;}
+.va-quadline .xy{font-variant-numeric:tabular-nums;color:var(--txt-4);font-size:10.5px;}
+.va-savebtn{width:min(100%,462px);padding:13px 0;border-radius:var(--r-md);background:var(--grad);color:#fff;
+  font-size:15px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 16px 38px -14px rgba(124,92,255,.95),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:filter .16s,transform .12s var(--ease);position:relative;overflow:hidden;}
+.va-savebtn:hover:not(:disabled){filter:brightness(1.12);}
+.va-savebtn:active:not(:disabled){transform:translateY(1px);}
+.va-savebtn:disabled{background:var(--surface-3);color:var(--txt-4);box-shadow:none;cursor:not-allowed;}
+.va-savebtn.edit{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 16px 38px -14px rgba(245,158,11,.9),inset 0 1px 0 rgba(255,255,255,.3);}
+.va-savebtn.flash::after{content:"";position:absolute;inset:0;background:rgba(61,220,151,.9);animation:vaFlash .5s var(--ease-out) forwards;}
+@keyframes vaFlash{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(1.04);}}
+.va-savebtn kbd{font-family:inherit;font-size:10px;font-weight:700;background:rgba(255,255,255,.2);border-radius:5px;padding:2px 6px;}
+.va-minorrow{display:flex;gap:8px;width:min(100%,462px);justify-content:center;}
+details.va-fix{width:min(100%,600px);font-size:11.5px;color:var(--txt-3);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:0;}
+details.va-fix summary{cursor:pointer;user-select:none;padding:10px 13px;font-weight:550;list-style:none;}
+details.va-fix summary::-webkit-details-marker{display:none;}
+details.va-fix summary:hover{color:var(--txt);}
+details.va-fix[open] summary{border-bottom:1px solid var(--line);}
+.va-fixgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:11px 13px;}
+
+/* 表单控件 */
+.va-field{display:block;margin-bottom:9px;}
+.va-field:last-child{margin-bottom:0;}
+.va-field>span{display:block;font-size:10.5px;color:var(--txt-3);margin-bottom:4px;font-weight:550;letter-spacing:.02em;}
+.va-field input,.va-field select,.va-fixgrid input,.va-fixgrid select,#vaRecSearch{
+  width:100%;height:34px;box-sizing:border-box;background:var(--well);border:1px solid var(--line-2);border-radius:var(--r-xs);
+  color:var(--txt);padding:8px 10px;font-size:12.5px;line-height:1.2;transition:border-color .15s,box-shadow .15s,background .15s;}
+.va-field input:focus,.va-field select:focus,.va-fixgrid input:focus,.va-fixgrid select:focus,#vaRecSearch:focus{
+  outline:none;border-color:rgba(139,92,246,.65);box-shadow:0 0 0 3px rgba(139,92,246,.16);background:var(--surface);}
+.va-field input::placeholder,.va-fixgrid input::placeholder,#vaRecSearch::placeholder{color:var(--txt-4);}
+.va-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.va-mbtilink{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--info);text-decoration:none;margin-top:8px;}
+.va-mbtilink:hover{text-decoration:underline;}
+.va-mbtilink.ok{color:var(--good);}
+
+/* ---------- 右：统计 ---------- */
+.va-statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.va-stat{background:var(--well);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;}
+.va-stat span{display:block;font-size:10px;color:var(--txt-3);letter-spacing:.03em;}
+.va-stat b{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+.va-stat.acc b{color:var(--ac);}
+.va-stat.good b{color:var(--good);}
+.va-note{font-size:10.5px;color:var(--txt-4);line-height:1.8;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+.va-grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+
+/* ============================================================ 播放条 */
+/* 播放条：固定在屏幕最底部，通栏，不随内容滚动、不悬空 */
+.va-bottom{position:fixed;left:0;right:0;bottom:0;z-index:60;
+  display:flex;align-items:center;gap:16px;padding:11px 18px;
+  background:linear-gradient(180deg,rgba(var(--hi),.02),rgba(var(--hi),.05)),var(--surface);
+  border-top:1px solid var(--line);flex-wrap:wrap;}
+.va-ctls{display:flex;align-items:center;gap:8px;}
+.va-ctl{width:34px;height:34px;border-radius:50%;background:var(--surface-3);border:1px solid var(--line-2);
+  color:var(--ctl-fg);font-size:13px;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(var(--hi),.06);transition:all .15s var(--ease);}
+.va-ctl:hover{background:var(--ctl-hover);color:var(--txt);transform:translateY(-1px);}
+.va-ctl:active{transform:none;}
+.va-ctl.main{width:46px;height:46px;font-size:17px;border:none;background:var(--grad);color:#fff;
+  box-shadow:0 10px 26px -8px rgba(124,92,255,.95),inset 0 1px 0 rgba(255,255,255,.3);}
+.va-ctl.main:hover{filter:brightness(1.12);transform:translateY(-1px);}
+.va-progwrap{flex:1;min-width:210px;display:flex;align-items:center;gap:10px;}
+.va-time{font-size:11px;color:var(--txt-3);font-variant-numeric:tabular-nums;min-width:38px;text-align:center;}
+.va-vol{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt-3);}
+.va-foot{font-size:10.5px;color:var(--txt-4);white-space:nowrap;}
+
+/* range 统一样式 */
+#va-app input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;height:18px;cursor:pointer;}
+#va-app input[type=range]:focus{outline:none;}
+#va-app input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:var(--r-pill);
+  background:linear-gradient(90deg,#8b5cf6,#3b82f6) 0/var(--p,0%) 100% no-repeat,var(--range-track);}
+#va-app input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--thumb-bg);margin-top:-4px;box-shadow:0 0 0 3px rgba(139,92,246,.28),0 2px 8px rgba(0,0,0,.6);
+  transition:box-shadow .15s var(--ease);}
+#va-app input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(139,92,246,.35),0 2px 10px rgba(0,0,0,.6);}
+#va-app input[type=range]::-moz-range-track{height:5px;border-radius:var(--r-pill);background:var(--range-track);}
+#va-app input[type=range]::-moz-range-progress{height:5px;border-radius:var(--r-pill);background:linear-gradient(90deg,#8b5cf6,#3b82f6);}
+#va-app input[type=range]::-moz-range-thumb{width:13px;height:13px;border:2px solid var(--ac);border-radius:50%;background:var(--thumb-bg);}
+#vaProg{flex:1;}
+#vaVol{width:74px;}
+
+/* ============================================================ 记录面板（左栏 · 曲库下方） */
+.va-recpanel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+.va-recpanel.flash{animation:vaFlash 1.1s var(--ease);}
+@keyframes vaFlash{0%,100%{box-shadow:var(--sh-2),inset 0 1px 0 rgba(var(--hi),.05);}
+  30%{box-shadow:0 0 0 2px var(--ac),var(--sh-2);}}
+.va-rec-tools{display:flex;gap:7px;align-items:center;padding:0 14px 10px;flex-wrap:wrap;}
+#vaRecSearch{flex:1;min-width:96px;}
+.va-reclist{flex:1;min-height:0;overflow:auto;padding:0 12px 12px;}
+.va-rec{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;margin-bottom:7px;
+  transition:border-color .15s,background .15s;animation:vaRise .25s var(--ease-out) both;}
+@keyframes vaRise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.va-rec:hover{border-color:var(--line-2);background:var(--surface-3);}
+.va-rec-top{display:flex;align-items:center;gap:8px;}
+.va-rec-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.va-rec-meta{font-size:10.5px;color:var(--txt-4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.va-rec-vals{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.va-rec-val{flex:1;min-width:54px;background:var(--well);border:1px solid var(--line);border-radius:var(--r-xs);padding:4px 8px;text-align:center;}
+.va-rec-val span{font-size:9.5px;color:var(--txt-4);display:block;}
+.va-rec-val b{font-size:13px;font-variant-numeric:tabular-nums;font-weight:700;}
+.va-rec-val.pos b{color:var(--good);}
+.va-rec-val.neg b{color:var(--bad);}
+.va-rec-act{display:flex;gap:6px;margin-top:9px;}
+.va-tag{font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:var(--r-pill);
+  background:var(--ac-soft);color:var(--tag-fg);border:1px solid rgba(139,92,246,.3);white-space:nowrap;}
+.va-tag.other{background:rgba(148,163,184,.1);color:var(--txt-3);border-color:rgba(148,163,184,.22);}
+
+/* ============================================================ 快捷键弹窗 */
+.va-modal{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:95;padding:24px;
+  background:var(--scrim);backdrop-filter:blur(3px);}
+.va-modal.on{display:flex;}
+.va-modal-card{width:min(520px,100%);background:linear-gradient(180deg,rgba(var(--hi),.05),rgba(var(--hi),.01)),var(--modal-bg);
+  border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-3);
+  animation:vaPop .22s var(--ease-out);max-height:100%;overflow:auto;}
+.va-modal-card header{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);}
+.va-modal-card header h2{font-size:14px;font-weight:650;flex:1;}
+.va-klist{padding:14px 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
+.va-krow{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--txt-2);}
+.va-krow .keys{display:flex;gap:3px;flex:none;}
+.va-key{min-width:24px;text-align:center;font-size:10.5px;font-weight:700;font-family:ui-monospace,Consolas,monospace;
+  background:var(--surface-3);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:2px 6px;color:var(--key-fg);}
+
+/* ============================================================ Toast */
+.va-toast{position:absolute;left:50%;bottom:88px;transform:translateX(-50%) translateY(10px);
+  background:var(--toast-bg);backdrop-filter:blur(10px);border:1px solid var(--line-2);color:var(--txt);
+  padding:10px 18px;border-radius:var(--r-pill);font-size:12.5px;font-weight:500;opacity:0;pointer-events:none;
+  transition:opacity .22s var(--ease),transform .28s var(--ease-out);max-width:82%;text-align:center;z-index:99;
+  box-shadow:var(--sh-3);}
+.va-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.va-toast.ok{border-color:rgba(61,220,151,.45);box-shadow:var(--sh-3),0 0 22px -6px rgba(61,220,151,.5);}
+.va-toast.bad{border-color:rgba(251,108,125,.45);}
+
+/* 滚动条 */
+#va-app ::-webkit-scrollbar{width:9px;height:9px;}
+#va-app ::-webkit-scrollbar-thumb{background:var(--sb);border-radius:var(--r-pill);border:2px solid transparent;background-clip:content-box;}
+#va-app ::-webkit-scrollbar-thumb:hover{background:var(--sb-h);background-clip:content-box;}
+#va-app ::-webkit-scrollbar-track{background:transparent;}
+
+@media (max-width:1080px){
+  .va-main{grid-template-columns:262px minmax(320px,1fr) 288px;gap:11px;padding:12px;}
+}
+@media (max-width:940px){
+  #va-app{height:auto;min-height:calc(100vh - 12px);box-sizing:border-box;
+    padding-bottom:calc(var(--player-h,58px) + 14px);}
+  .va-main{grid-template-columns:1fr;}
+  .va-playlist{max-height:250px;}
+  .va-recpanel{flex:0 0 auto;}
+  .va-reclist{max-height:340px;}
+  .va-center{order:-1;}
+  .va-rail{display:none;}
+  /* 手机端：控件字号≥16px，点输入框时浏览器不会自动放大页面、框也不会变大盖住邻居 */
+  .va-field input,.va-field select,.va-fixgrid input,.va-fixgrid select,#vaRecSearch{font-size:16px;height:38px;}
+}
+
+/* ========== Likert 打分（新增） ========== */
+.va-likert{width:min(100%,600px);display:flex;flex-direction:column;gap:8px;}
+.va-lk{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:9px 12px 10px;transition:border-color .18s var(--ease),background .18s var(--ease);}
+.va-lk.miss{border-color:rgba(251,108,125,.45);background:rgba(251,108,125,.05);}
+.va-lk-h{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt-2);}
+.va-lk-h b{color:var(--txt);font-weight:600;font-size:12.5px;}
+.va-lk-h em{font-style:normal;color:var(--txt-4);font-size:10.5px;}
+.va-lk-h .kbd{color:var(--txt-4);font-size:10px;border:1px solid var(--line-2);border-radius:4px;padding:0 4px;}
+.va-lk-val{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ac);font-weight:600;font-size:13px;}
+.va-lk-row{display:flex;gap:5px;margin-top:8px;}
+.va-lk-dot{flex:1;min-width:26px;min-height:34px;border-radius:var(--r-xs);border:1px solid var(--line-2);background:var(--surface-3);color:var(--txt-2);font-size:12.5px;font-weight:600;transition:all .14s var(--ease);}
+.va-lk-dot:hover{border-color:var(--ac);color:var(--txt);background:var(--ac-soft);}
+.va-lk-dot.on{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 4px 14px -6px rgba(139,92,246,.95);}
+.va-lk-dot:active{transform:scale(.94);}
+.va-lk-ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--txt-4);margin-top:6px;}
+.va-lk-ends span:first-child{text-align:left;}
+.va-lk-ends span:last-child{text-align:right;}
+.va-lk-head{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.va-lk-head h4{font-size:12px;font-weight:600;color:var(--txt-2);margin:0;}
+.va-lk-tip{font-size:10.5px;color:var(--txt-4);}
+
+/* 小输入框（流程控制 / 后端接口用） */
+.va-mini{width:100%;background:var(--well);border:1px solid var(--line);border-radius:var(--r-xs);color:var(--txt);font-size:11.5px;padding:5px 7px;outline:none;}
+.va-mini:focus{border-color:var(--ac);}
+select.va-mini{padding:5px 4px;}
+.va-sync{font-size:11px;color:var(--txt-3);margin-top:6px;display:flex;align-items:center;gap:6px;}
+.va-sync b{color:var(--warn);}
+</style>
+
+<div id="va-app" data-theme="light">
+  <div class="va-decor"><i></i></div>
+
+  <header class="va-top">
+    <div class="va-brand">
+      <div class="va-mark">VA</div>
+      <div>
+        <h1>音乐情感标注台</h1>
+        <p>Valence 效价 × Arousal 唤醒度 · 一次点击得到两个维度</p>
+      </div>
+    </div>
+    <div class="va-rail" title="标注完成度"><i id="vaRailFill"></i><b id="vaRailText">0%</b></div>
+    <div class="va-topstats" id="vaTopStats"></div>
+    <div class="va-topactions">
+      <button class="va-btn" id="vaRecBtn" type="button">🗂 我的记录</button>
+      <button class="va-btn ghost" id="vaThemeBtn" type="button" title="切换深色 / 浅色">🌙 深色</button>
+      <button class="va-btn ghost" id="vaKeysBtn" type="button" aria-label="快捷键说明">⌨</button>
+      <button class="va-btn ghost" id="vaImpBtn" type="button" title="导入之前导出的标注 JSON，继续标注（不是添加音频）">⬆ 导入标注</button>
+      <button class="va-btn ghost" id="vaExpBtn" type="button" aria-haspopup="true">⬇ 导出</button>
+      <div class="va-menu" id="vaExpMenu">
+        <button id="vaExpCsv" type="button">📄 导出 CSV<small>一行一首歌，Excel / WPS 直接打开</small></button>
+        <button id="vaExpBackup" type="button">💾 导出备份 JSON<small>换电脑 / 清浏览器数据前导出，之后可导入还原</small></button>
+      </div>
+      <input type="file" id="vaImpFile" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <div class="va-warn" id="vaWarn" hidden>⚠ 当前预览环境不支持本地持久化：数据仅保存在本次会话中，请及时导出；正式使用请打开完整版 HTML 文件。</div>
+
+  <div class="va-main">
+    <!-- 曲库 -->
+    <aside class="va-col">
+      <label class="va-drop" for="vaFile">＋ 添加音频文件</label>
+      <input type="file" id="vaFile" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac,.wma,.opus" multiple hidden>
+      <button class="va-btn ghost block" id="vaDemoBtn" type="button">🧪 没有文件？生成 3 首示例音频</button>
+      <div class="va-seg" id="vaFilter" role="tablist">
+        <button type="button" class="on" data-f="all">全部</button>
+        <button type="button" data-f="todo">待标</button>
+        <button type="button" data-f="done">已标</button>
+      </div>
+      <div class="va-plhead">
+        <span>曲库 <b id="vaPlCount">0</b></span>
+        <label class="va-chk"><input type="checkbox" id="vaRand" checked>随机发曲</label>
+        <button class="va-btn tiny ghost" id="vaShuffle" type="button">🔀 重排</button>
+      </div>
+      <div class="va-playlist" id="vaPlaylist"></div>
+      <div class="va-hint">在资源管理器里选中需要的音频（可 Ctrl 多选 / Shift 连选）再拖进窗口，**只有选中的才会进曲库**。文件名按 <code>国家_风格_曲目_片段_歌词段_来源</code> 自动识别，识别不了就在中间「手动修正」里改。<br>每项右上角 <b>✕</b> 可把单曲移出曲库（不动电脑文件、不删已存分数）；点<b>已标</b>条目可修改那次的分数。</div>
+
+      <div class="va-panel va-recpanel" id="vaRecPanel">
+        <h3>标注记录 <em id="vaRecSub">共 0 条</em></h3>
+        <div class="va-rec-tools">
+          <input id="vaRecSearch" placeholder="搜索文件名 / 国家 / 风格…">
+          <div class="va-seg" style="width:126px;flex:none" id="vaRecFilter">
+            <button type="button" class="on" data-r="mine">我的</button>
+            <button type="button" data-r="all">全部</button>
+          </div>
+        </div>
+        <div class="va-reclist" id="vaRecList"></div>
+      </div>
+    </aside>
+
+    <!-- 打分 -->
+    <section class="va-center">
+      <div class="va-now">
+        <div class="va-nowtitle placeholder" id="vaNowTitle">导入音频后开始标注</div>
+        <div class="va-chips" id="vaNowChips"></div>
+      </div>
+
+      <div class="va-vaspace">
+        <canvas id="vaCanvas" aria-label="VA 二维情感空间：横轴效价（左消极右积极），纵轴唤醒度（上激动下平静），点击或拖动打分"></canvas>
+      </div>
+
+      <div class="va-likert" id="vaLikert"></div>
+
+      <div class="va-quadline" id="vaQuad" aria-live="polite"><span class="qdot"></span><span id="vaQuadText">听完音乐 → 在图中点一下 → 保存</span></div>
+
+      <button class="va-savebtn" id="vaSave" type="button" disabled>保存并下一条 <kbd>S</kbd></button>
+      <div class="va-minorrow">
+        <button class="va-btn tiny ghost" id="vaClearAnchor" type="button">清除打分</button>
+        <button class="va-btn tiny ghost" id="vaSkip" type="button">跳过此曲</button>
+        <button class="va-btn tiny ghost" id="vaCancelEdit" type="button" hidden>放弃修改</button>
+      </div>
+
+      <details class="va-fix">
+        <summary>⚙ 命名没识别对？手动修正当前曲目信息（会写进标注记录）</summary>
+        <div class="va-fixgrid">
+          <input id="vaFCountry" placeholder="国家/地区">
+          <input id="vaFStyle" placeholder="风格">
+          <input id="vaFTrack" placeholder="曲目#">
+          <input id="vaFSeg" placeholder="片段#">
+          <input id="vaFLyric" placeholder="歌词段#">
+          <select id="vaFSource"><option value="">来源未知</option><option>AI生成</option><option>真人</option></select>
+        </div>
+      </details>
+    </section>
+
+    <!-- 信息 / 数据 -->
+    <aside class="va-col va-col-scroll">
+      <div class="va-panel">
+        <h3>标注人 <em id="vaWhoTag"></em></h3>
+        <div class="va-pad">
+          <label class="va-field"><span>姓名（用于区分不同标注人）</span><input id="vaPName" placeholder="如：张三"></label>
+          <div class="va-row2">
+            <label class="va-field"><span>年龄</span><input id="vaPAge" inputmode="numeric" placeholder="—"></label>
+            <label class="va-field"><span>性别</span><select id="vaPGender"><option value="">未填</option><option>男</option><option>女</option><option>其他</option><option>保密</option></select></label>
+          </div>
+          <label class="va-field"><span>家乡</span><input id="vaPHome" placeholder="如：湖南长沙"></label>
+          <label class="va-field"><span>MBTI</span><input id="vaPMbti" placeholder="如 INTJ" style="text-transform:uppercase"></label>
+          <div class="va-row2">
+            <label class="va-field"><span>乐器学习</span><select id="vaPInst"><option value="">未填</option><option>没学过</option><option>1年以内</option><option>1-3年</option><option>3-5年</option><option>5年以上</option></select></label>
+            <label class="va-field"><span>每天听歌</span><select id="vaPListen"><option value="">未填</option><option>几乎不听</option><option>0.5小时内</option><option>0.5-2小时</option><option>2小时以上</option></select></label>
+          </div>
+          <a id="vaMbtiLink" class="va-mbtilink" href="https://www.16personalities.com/ch/%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95" target="_blank" rel="noopener">✏ 没填？做 MBTI 测试 ↗</a>
+        </div>
+      </div>
+
+      <div class="va-panel">
+        <h3>进度</h3>
+        <div class="va-pad">
+          <div class="va-statgrid" id="vaStats"></div>
+          <p class="va-note">🛡 盲标：不显示他人分数。同一音频可由多人重复标注，每条记录独立保存、互不覆盖。<br>💾 每打一条分即刻保存到本机，软件卡了 / 闪退不丢数据；换电脑或清理浏览器数据前，请先在右上角「导出」备份 CSV。</p>
+        </div>
+      </div>
+
+      <div class="va-panel">
+        <h3>数据</h3>
+        <div class="va-pad">
+          <div class="va-grid2">
+            <button class="va-btn" id="vaOpenRec" type="button">查看记录</button>
+            <button class="va-btn" id="vaUndo" type="button">撤销上一条</button>
+            <button class="va-btn" id="vaImpBtn2" type="button">导入标注 JSON</button>
+            <button class="va-btn" id="vaExpBackup2" type="button">完整备份</button>
+          </div>
+          <details class="va-fix" style="width:100%;margin-top:8px">
+            <summary>⚙ 流程控制 · 后端接口 · 曲库缓存</summary>
+            <div style="padding-top:9px">
+              <label class="va-field"><span>最少听满才能保存</span>
+                <select id="vaStrict" class="va-mini">
+                  <option value="0">不限制</option>
+                  <option value="0.3">30%</option>
+                  <option value="0.5">50%（推荐）</option>
+                  <option value="0.8">80%</option>
+                  <option value="1">必须完整听完一遍</option>
+                </select></label>
+              <label class="va-field"><span>后端接收地址（留空=仅本地）</span><input id="vaApiUrl" class="va-mini" placeholder="https://your-server/api/records"></label>
+              <label class="va-chk" style="margin:6px 0"><input type="checkbox" id="vaRemember" checked>记住曲库（刷新不丢音频）</label>
+              <div class="va-grid2">
+                <button class="va-btn tiny" id="vaSyncBtn" type="button">☁ 重试同步</button>
+                <button class="va-btn tiny ghost" id="vaLibClear" type="button">🗑 清除缓存音频</button>
+              </div>
+              <div class="va-sync" id="vaSyncState"></div>
+            </div>
+          </details>
+          <div style="margin-top:7px"><button class="va-btn bad block" id="vaClear" type="button">清空全部标注数据</button></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 播放条 -->
+  <div class="va-bottom">
+    <div class="va-ctls">
+      <button class="va-ctl" id="vaPrev" type="button" aria-label="上一首 (P)">⏮</button>
+      <button class="va-ctl main" id="vaPlay" type="button" aria-label="播放 / 暂停（空格）">▶</button>
+      <button class="va-ctl" id="vaReplay" type="button" aria-label="重播本曲">↻</button>
+      <button class="va-ctl" id="vaNext" type="button" aria-label="下一首 (N)">⏭</button>
+    </div>
+    <div class="va-progwrap">
+      <span class="va-time" id="vaTcur">0:00</span>
+      <input type="range" id="vaProg" min="0" max="1000" value="0" aria-label="播放进度">
+      <span class="va-time" id="vaTdur">0:00</span>
+    </div>
+    <div class="va-vol">🔊 <input type="range" id="vaVol" min="0" max="100" value="90" aria-label="音量"></div>
+    <div class="va-foot" id="vaFootStats"></div>
+  </div>
+
+  <!-- 快捷键弹窗 -->
+  <div class="va-modal" id="vaKeys">
+    <div class="va-modal-card">
+      <header><h2>快捷键</h2><button class="va-btn tiny ghost" id="vaKeysClose" type="button">✕</button></header>
+      <div class="va-klist">
+        <div class="va-krow"><span class="keys"><b class="va-key">Space</b></span>播放 / 暂停</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">S</b></span>保存并下一条</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">N</b></span>下一首（未标注）</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">P</b></span>上一首</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">←</b><b class="va-key">→</b></span>快退 / 快进 5 秒</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">R</b></span>重播本曲</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">X</b></span>清除当前这个打分</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">↑</b><b class="va-key">↓</b><b class="va-key">←</b><b class="va-key">→</b></span>微调打分位置 0.5%</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">Shift</b>+<b class="va-key">方向</b></span>大幅微调 2%</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">?</b></span>打开本面板</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">D</b></span>开关曲库随机发曲</div>
+        <div class="va-krow"><span class="keys"><b class="va-key">Esc</b></span>关闭弹层 / 退出编辑</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="va-toast" id="vaToast" role="status" aria-live="polite"></div>
+  <audio id="vaAudio" preload="metadata"></audio>
+</div>
+
+<script>
+(function(){
+  if(window.__vaInit) return; window.__vaInit=true;
+  var $=function(id){return document.getElementById(id);};
+  var root=$('va-app'), cv=$('vaCanvas'), ctx=cv.getContext('2d'), audio=$('vaAudio');
+  var FZ='-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif';
+  var KEY='va_annotator_v2', KEY_OLD='va_annotator_v1';
+
+  /* ---------- 打分维度（Likert，初版留空：只标 VA 画布） ---------- */
+  /* 想恢复打分：把三项填回来即可，UI 会自动出现（renderLikert 按数组渲染） */
+  var DEFDIMS=[];
+
+  /* ---------- 持久化 ---------- */
+  var persistent=true;
+  function empty(){ return {records:[],overrides:{},plays:{},drafts:{},queue:[],heard:{},
+    dims:JSON.parse(JSON.stringify(DEFDIMS)),
+    settings:{strict:0.5,remember:true,apiUrl:'',theme:'light'},
+    profile:{name:'',age:'',gender:'',hometown:'',mbti:'',instrument:'',listen:''}}; }
+  function loadStore(){
+    var raw=null;
+    try{ raw=localStorage.getItem(KEY); }catch(e){ persistent=false; }
+    if(!raw){ try{ raw=localStorage.getItem(KEY_OLD); }catch(e){} }
+    if(!raw && window.zcode && window.zcode.widgetState && window.zcode.widgetState.privateContent) raw=window.zcode.widgetState.privateContent;
+    var s=empty();
+    if(raw){ try{ var p=JSON.parse(raw); s.records=p.records||[]; s.overrides=p.overrides||{}; s.plays=p.plays||{};
+      s.drafts=p.drafts||{}; s.queue=p.queue||[]; s.heard=p.heard||{};
+      /* 初版不启用 Likert 打分：dims 恒为空。老记录里的 likert 分数仍保留，导出不丢 */
+      s.settings=Object.assign(empty().settings,p.settings||{});
+      s.profile=Object.assign(empty().profile,p.profile||{}); }catch(e){} }
+    return s;
+  }
+  var store=loadStore();
+  function save(){
+    if(persistent){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
+    if(window.zcode && window.zcode.setWidgetState){ try{ window.zcode.setWidgetState({privateContent:JSON.stringify(store)}).catch(function(){}); }catch(e){} }
+  }
+  if(!persistent) $('vaWarn').hidden=false;
+
+  /* ---------- 状态 ---------- */
+  var tracks=[], curIndex=-1, cur=null;
+  var anchor=null, dragging=false, hoverPos=null;
+  var anchors={}, editingId=null;
+  var playCounted=false, trackStartAt=0, progDrag=false, filter='all';
+  var lk={}, activeDim=0, heard=store.heard;   /* 打分值 / 当前聚焦维度 / 每首听过的最大进度（持久化） */
+  var theme='light';                           /* light | dark —— 默认浅色，打开即白底 */
+
+  /* ---------- 工具 ---------- */
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function fnv(str){ var h=2166136261>>>0; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h.toString(36); }
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } }
+  function fmtTime(s){ if(!isFinite(s)||s<0) s=0; var m=Math.floor(s/60), x=Math.floor(s%60); return m+':'+String(x).padStart(2,'0'); }
+  function fmtV(v){ return (v>0?'+':'')+v.toFixed(2); }
+  function clamp(v){ return Math.min(1,Math.max(0,v)); }
+  var toastTimer=null;
+  function toast(msg,kind){ var t=$('vaToast'); t.textContent=msg; t.className='va-toast show'+(kind?' '+kind:'');
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2800); }
+  function stamp(){ var d=new Date(),p=function(n){return String(n).padStart(2,'0');};
+    return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes()); }
+  function fallbackDl(blob,name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},800); }
+  function dl(blob,name){
+    /* iPad / iPhone Safari：blob 直接下载不可靠，优先弹系统分享面板（存储到文件 / AirDrop / 微信） */
+    try{
+      var file=new File([blob],name,{type:blob.type||'application/octet-stream'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:name}).then(function(){
+          toast('已导出，在分享面板里选「存储到文件」保存','ok');
+        }).catch(function(e){ if(e&&e.name==='AbortError') return; fallbackDl(blob,name); });
+        return;
+      }
+    }catch(e){}
+    fallbackDl(blob,name);
+  }
+  function recTime(iso){ var d=new Date(iso); return isNaN(d)?String(iso||''):(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+  /* ---------- 文件名解析：国家_风格_曲目_片段_歌词段_来源 ---------- */
+  var COUNTRIES={cn:'中国',china:'中国',us:'美国',usa:'美国',jp:'日本',japan:'日本',kr:'韩国',korea:'韩国',de:'德国',fr:'法国',gb:'英国',uk:'英国',en:'英国',br:'巴西',in:'印度',es:'西班牙',it:'意大利',mx:'墨西哥',ru:'俄罗斯',se:'瑞典',no:'挪威',tr:'土耳其',eg:'埃及',ng:'尼日利亚',id:'印尼',th:'泰国',vn:'越南',ph:'菲律宾',ca:'加拿大',au:'澳大利亚',ar:'阿根廷',pl:'波兰',nl:'荷兰',pt:'葡萄牙',gr:'希腊',il:'以色列',sa:'沙特',za:'南非'};
+  var STYLES={pop:'流行',folk:'民谣',rock:'摇滚',electronic:'电子',edm:'电子',electro:'电子',classical:'古典',jazz:'爵士',hiphop:'嘻哈',rap:'说唱',rnb:'R&B',country:'乡村',metal:'金属',blues:'布鲁斯',latin:'拉丁',reggae:'雷鬼',ambient:'氛围',soul:'灵魂',disco:'迪斯科',punk:'朋克',gospel:'福音',opera:'歌剧','流行':'流行','民谣':'民谣','摇滚':'摇滚','电子':'电子','电音':'电子','古典':'古典','爵士':'爵士','嘻哈':'嘻哈','说唱':'说唱','乡村':'乡村','金属':'金属','古风':'古风','戏曲':'戏曲','民乐':'民乐'};
+  function parseName(fileName){
+    var base=fileName.replace(/\.[a-z0-9]+$/i,'');
+    var tokens=base.split(/[_\-,.\s]+/).filter(Boolean);
+    var meta={country:'',style:'',track:'',segment:'',lyric:'',source:''}, bare=[];
+    for(var i=0;i<tokens.length;i++){
+      var t=tokens[i].toLowerCase(), m;
+      if(!meta.country && COUNTRIES[t]){ meta.country=COUNTRIES[t]; continue; }
+      if(!meta.style && STYLES[t]){ meta.style=STYLES[t]; continue; }
+      if(!meta.source && /^(ai|aigc|suno|svc|tts|synth|生成)$/.test(t)){ meta.source='AI生成'; continue; }
+      if(!meta.source && /^(human|real|original|真人|原唱|人声)$/.test(t)){ meta.source='真人'; continue; }
+      if(!meta.segment && (m=t.match(/^(?:seg|clip|p|片段|段)(\d{1,3})$/))){ meta.segment=m[1]; continue; }
+      if(!meta.lyric && (m=t.match(/^(?:lyrics?|lyr|l|词|歌词)(\d{1,3})$/))){ meta.lyric=m[1]; continue; }
+      if(/^\d{1,3}$/.test(t)){ bare.push(t); continue; }
+      if(!meta.track && (m=t.match(/^(?:t|track|song|trk|曲|曲目)(\d{1,3})$/))){ meta.track=m[1]; continue; }
+    }
+    for(var j=0;j<bare.length;j++){ if(!meta.track) meta.track=bare[j]; else if(!meta.segment) meta.segment=bare[j]; else if(!meta.lyric) meta.lyric=bare[j]; }
+    return meta;
+  }
+  function effMeta(t){
+    var o=(store.overrides[t.id])||{}, m=Object.assign({},t.parsed);
+    for(var k in o){ if(k in o) m[k]=o[k]; }
+    return m;
+  }
+  function audioIdOf(name,size,lm){ return 'A-'+fnv(name+'|'+(size||0)+'|'+(lm||0)); }
+
+  /* ---------- 标注人信息 ---------- */
+  var P={name:$('vaPName'),age:$('vaPAge'),gender:$('vaPGender'),home:$('vaPHome'),mbti:$('vaPMbti'),inst:$('vaPInst'),listen:$('vaPListen')};
+  function myName(){ return store.profile.name||'匿名'; }
+  function loadProfile(){ P.name.value=store.profile.name||''; P.age.value=store.profile.age||'';
+    P.gender.value=store.profile.gender||''; P.home.value=store.profile.hometown||''; P.mbti.value=store.profile.mbti||'';
+    P.inst.value=store.profile.instrument||''; P.listen.value=store.profile.listen||''; }
+  function updateMbtiLink(){
+    var a=$('vaMbtiLink'), v=(store.profile.mbti||'').toUpperCase();
+    a.textContent = v ? '✔ MBTI：'+v : '✏ 没填？做 MBTI 测试 ↗';
+    a.classList.toggle('ok',!!v);
+  }
+  function bindProfile(){
+    var handler=function(){
+      store.profile={name:P.name.value.trim(),age:P.age.value.trim(),gender:P.gender.value,
+        hometown:P.home.value.trim(),mbti:P.mbti.value.trim().toUpperCase(),
+        instrument:P.inst.value,listen:P.listen.value};
+      save(); updateMbtiLink(); refresh();
+    };
+    for(var k in P){ P[k].addEventListener('input',handler); }
+  }
+  $('vaMbtiLink').addEventListener('click',function(e){
+    if(window.zcode && window.zcode.openExternal){ e.preventDefault(); window.zcode.openExternal({href:this.href}); }
+  });
+
+  /* ---------- 打分维度（Likert） ---------- */
+  function dims(){ return store.dims; }
+  function activeKey(){ var d=dims()[activeDim]; return d?d.key:null; }
+  function missing(){
+    var m=[];
+    if(!anchor) m.push('在画布上点一下');
+    dims().forEach(function(d){ if(lk[d.key]==null) m.push(d.label); });
+    return m;
+  }
+  function renderLikert(){
+    var box=$('vaLikert');
+    if(!cur || !dims().length){ box.innerHTML=''; box.hidden=true; return; }
+    box.hidden=false;
+    box.innerHTML=dims().map(function(d,i){
+      var v=lk[d.key], n=d.scale, dots='';
+      for(var s=1;s<=n;s++){
+        dots+='<button type="button" class="va-lk-dot'+(v===s?' on':'')+'" data-i="'+i+'" data-v="'+s+'">'+s+'</button>';
+      }
+      return '<div class="va-lk'+(v==null?' miss':'')+'" data-i="'+i+'">'
+        +'<div class="va-lk-h"><b>'+esc(d.label)+'</b>'+(d.en?'<em>'+esc(d.en)+'</em>':'')
+        +(i===activeDim?'<span class="kbd">Tab 当前</span>':'')
+        +'<span class="va-lk-val">'+(v==null?'未打分':(v+' / '+n))+'</span></div>'
+        +'<div class="va-lk-row">'+dots+'</div>'
+        +'<div class="va-lk-ends"><span>'+esc(d.lo)+'</span><span>'+esc(d.hi)+'</span></div></div>';
+    }).join('');
+  }
+  $('vaLikert').addEventListener('click',function(e){
+    var b=e.target.closest('.va-lk-dot'); if(!b) return;
+    setLk(+b.dataset.i,+b.dataset.v);
+  });
+  function setLk(i,v){
+    var d=dims()[i]; if(!d||!cur) return;
+    lk[d.key]=v; activeDim=i; saveDraft(); renderLikert(); updateReadouts();
+  }
+  function saveDraft(){
+    if(!cur) return;
+    store.drafts[cur.id]={x:anchor?anchor.x:null,y:anchor?anchor.y:null,lk:JSON.parse(JSON.stringify(lk))};
+    save();
+  }
+  /* ---------- 记录查询 ---------- */
+  function myRec(audioId){
+    for(var i=store.records.length-1;i>=0;i--){
+      var r=store.records[i];
+      if(r.audio_id===audioId && r.annotator_name===myName()) return r;
+    }
+    return null;
+  }
+  function annotatedByMe(t){ return !!myRec(t.id); }
+  function ratersOf(id){
+    var seen={}, n=0;
+    store.records.forEach(function(r){ if(r.audio_id===id && !seen[r.annotator_name]){ seen[r.annotator_name]=1; n++; } });
+    return n;
+  }
+
+  /* ---------- 曲库 ---------- */
+  function addFiles(fileList){
+    var files=Array.prototype.slice.call(fileList).filter(function(f){
+      return /^audio\//.test(f.type||'')||/\.(wav|mp3|ogg|oga|m4a|flac|aac|wma|opus|webm)$/i.test(f.name); });
+    if(!files.length){ toast('未识别到音频文件','bad'); return; }
+    var seen={}, added=0;
+    tracks.forEach(function(t){ seen[t.id]=1; });
+    files.forEach(function(f){
+      var id=audioIdOf(f.name,f.size,f.lastModified);
+      if(seen[id]) return; seen[id]=1;
+      tracks.push({id:id,name:f.name,url:URL.createObjectURL(f),parsed:parseName(f.name),plays:store.plays[id]||0});
+      added++;
+      if(store.settings.remember) idbPut({id:id,name:f.name,size:f.size,lm:f.lastModified,blob:f});
+    });
+    shuffle(tracks); refresh();
+    if(added) toast('已导入 '+added+' 首，已随机排序','ok');
+    if(curIndex<0 && tracks.length) selectTrack(0);
+  }
+  $('vaFile').addEventListener('change',function(e){ addFiles(e.target.files); e.target.value=''; });
+  root.addEventListener('dragover',function(e){ e.preventDefault(); });
+  root.addEventListener('drop',function(e){ e.preventDefault(); if(e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+  $('vaShuffle').addEventListener('click',function(){
+    if(!tracks.length){ toast('曲库为空'); return; }
+    var c=cur; shuffle(tracks); curIndex=c?tracks.indexOf(c):curIndex; refresh(); toast('曲库已随机重排');
+  });
+  $('vaFilter').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    filter=b.dataset.f;
+    Array.prototype.forEach.call(this.children,function(x){ x.classList.toggle('on',x===b); });
+    renderPlaylist();
+  });
+  $('vaRand').addEventListener('change',function(){ toast(this.checked?'已开启随机发曲':'已关闭随机发曲'); });
+
+  /* 单曲移出曲库：不动电脑文件、不删已存分数记录（记录按 audio_id 留着，以后重新导入同一文件会重新关联） */
+  function removeTrack(id){
+    var i=-1; for(var k=0;k<tracks.length;k++){ if(tracks[k].id===id){ i=k; break; } }
+    if(i<0) return;
+    var nm=tracks[i].name.replace(/\.[a-z0-9]+$/i,'');
+    if(!confirm('确定把「'+nm+'」移出曲库？\n\n只是从本软件移除，电脑里的文件不受影响；已保存的分数记录仍会保留。')) return;
+    var wasCur=(i===curIndex);
+    tracks.splice(i,1); idbDel(id);
+    if(wasCur){
+      audio.pause();
+      if(curIndex>=tracks.length) curIndex=tracks.length-1;
+      if(curIndex<0){ curIndex=-1; cur=null; anchor=null; editingId=null; audio.removeAttribute('src'); }
+    }else if(i<curIndex){ curIndex--; }
+    refresh();
+    if(wasCur && curIndex>=0) selectTrack(curIndex,true);
+    toast('已移出曲库：'+nm);
+  }
+
+  /* ---------- 示例音频 ---------- */
+  function bufferToWav(buffer){
+    var sr=buffer.sampleRate, len=buffer.length, ch=buffer.numberOfChannels;
+    var bytes=44+len*ch*2, ab=new ArrayBuffer(bytes), dv=new DataView(ab);
+    var ws=function(o,s){ for(var i=0;i<s.length;i++) dv.setUint8(o+i,s.charCodeAt(i)); };
+    ws(0,'RIFF'); dv.setUint32(4,bytes-8,true); ws(8,'WAVE'); ws(12,'fmt ');
+    dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,ch,true);
+    dv.setUint32(24,sr,true); dv.setUint32(28,sr*ch*2,true); dv.setUint16(32,ch*2,true); dv.setUint16(34,16,true);
+    ws(36,'data'); dv.setUint32(40,len*ch*2,true);
+    var d=buffer.getChannelData(0), off=44;
+    for(var i=0;i<len;i++){ var v=Math.max(-1,Math.min(1,d[i])); dv.setInt16(off, v<0?v*0x8000:v*0x7fff, true); off+=2; }
+    return new Blob([ab],{type:'audio/wav'});
+  }
+  function synthDemo(kind){
+    var sr=22050, dur=8;
+    /* 旧版 iPadOS Safari 只有 webkitOfflineAudioContext，做个回退 */
+    var OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    if(!OAC) return Promise.reject(new Error('no-offline-audio'));
+    var octx=new OAC(1,sr*dur,sr);
+    var master=octx.createGain(); master.gain.value=0.85; master.connect(octx.destination);
+    var note=function(t,f,d,type,vol){
+      var o=octx.createOscillator(), g=octx.createGain();
+      o.type=type; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vol,t+0.025); g.gain.exponentialRampToValueAtTime(0.0008,t+d);
+      o.connect(g); g.connect(master); o.start(t); o.stop(Math.min(dur,t+d+0.05));
+    };
+    if(kind==='happy'){
+      var sc=[261.63,329.63,392.00,523.25,659.26], bt=60/132;
+      for(var i=0;i<18;i++){ note(i*bt, sc[i%sc.length]*(i>=9?2:1), bt*1.6,'triangle',0.30); if(i%4===0) note(i*bt,130.81,1.4,'sine',0.22); }
+    }else if(kind==='sad'){
+      var ch=[[220,261.63,329.63],[174.61,220,261.63],[196.00,246.94,293.66],[164.81,207.65,246.94]];
+      ch.forEach(function(c,ci){ c.forEach(function(f){ note(ci*2,f,2.3,'sine',0.15); }); note(ci*2,c[0]/2,2.3,'sine',0.12); });
+    }else{
+      var bt2=60/168;
+      for(var k=0;k<22;k++){ note(k*bt2, k%8===7?466.16:233.08, 0.14,'square',0.16); if(k%2===0) note(k*bt2,58.27,0.30,'sawtooth',0.20); }
+    }
+    return octx.startRendering().then(bufferToWav);
+  }
+  var DEMOS=[{kind:'happy',name:'CN_流行_track01_seg01_lyric01_human.wav'},{kind:'sad',name:'JP_民谣_track02_seg01_lyric01_human.wav'},{kind:'tense',name:'US_电子_track03_seg02_lyric02_AI.wav'}];
+  function addDemo(){
+    var btn=$('vaDemoBtn'); btn.disabled=true; var oldLabel=btn.textContent; btn.textContent='⏳ 合成中…';
+    var done=function(){ btn.disabled=false; btn.textContent=oldLabel; };
+    var seen={}; tracks.forEach(function(t){ seen[t.id]=1; });
+    var chain=Promise.resolve(), n=0;
+    DEMOS.forEach(function(d){
+      chain=chain.then(function(){
+        return synthDemo(d.kind).then(function(blob){
+          var id=audioIdOf(d.name,blob.size,0);
+          if(seen[id]) return; seen[id]=1;
+          tracks.push({id:id,name:d.name,url:URL.createObjectURL(blob),parsed:parseName(d.name),plays:store.plays[id]||0,demo:true});
+          n++;
+        });
+      });
+    });
+    chain.then(function(){
+      shuffle(tracks); refresh();
+      if(curIndex<0 && tracks.length) selectTrack(0);
+      done();
+      toast(n?('已生成 '+n+' 首示例音频（明快 / 忧伤 / 紧张）','ok'):'示例音频已在曲库中');
+    }).catch(function(){ done(); toast('示例生成失败：本环境不支持 Web Audio 离线渲染','bad'); });
+  }
+  $('vaDemoBtn').addEventListener('click',addDemo);
+
+  /* ---------- 选曲与播放 ---------- */
+  function selectTrack(i,force){
+    if(i<0||i>=tracks.length) return;
+    /* 防重复打分：任何途径切到"自己已打过分"的曲子都先警告（曲库点击 / 上一首 / 快捷键 P 都走这里）。
+       记录列表里显式点「修改这条」传 force=true 跳过（按钮本身已表明意图） */
+    var r=myRec(tracks[i].id);
+    if(r && i!==curIndex && !force && !confirm('⚠ 这首歌你已经打过分了\n\n当前分数：V='+fmtV(r.valence)+'   A='+fmtV(r.arousal)
+      +'\n保存时间：'+recTime(r.saved_at)+'\n\n「确定」= 进入修改，保存后会覆盖原分数\n「取消」= 什么都不改变')) return;
+    curIndex=i; cur=tracks[i];
+    audio.src=cur.url;
+    audio.play().catch(function(){});
+    playCounted=false; trackStartAt=performance.now();
+
+    var rec=myRec(cur.id), d=store.drafts[cur.id]||null;
+    if(rec){
+      editingId=rec.record_id;
+      anchor={x:rec.x,y:rec.y}; anchors[cur.id]=anchor;
+      lk=rec.likert?JSON.parse(JSON.stringify(rec.likert)):{};
+    }else{
+      editingId=null;
+      anchor=(d&&d.x!=null)?{x:d.x,y:d.y}:(anchors[cur.id]||null);
+      lk=(d&&d.lk)?JSON.parse(JSON.stringify(d.lk)):{};
+    }
+    activeDim=0;
+    refresh();
+  }
+  function nextTrack(){
+    if(!tracks.length) return;
+    var rand=$('vaRand').checked, idx=-1;
+    if(rand){
+      var cands=[];
+      tracks.forEach(function(t,i){ if(i!==curIndex && !annotatedByMe(t)) cands.push(i); });
+      if(cands.length) idx=cands[(Math.random()*cands.length)|0];
+    }else{
+      for(var s=1;s<=tracks.length;s++){
+        var i2=(curIndex+s)%tracks.length;
+        if(i2!==curIndex && !annotatedByMe(tracks[i2])){ idx=i2; break; }
+      }
+    }
+    if(idx<0){ toast('🎉 当前曲库你已全部标注完成','ok'); return; }
+    selectTrack(idx);
+  }
+  function prevTrack(){ if(!tracks.length) return; selectTrack((curIndex-1+tracks.length)%tracks.length); }
+  function togglePlay(){
+    if(!audio.src){ toast('先在左侧添加并选择音频'); return; }
+    if(audio.paused) audio.play().catch(function(){}); else audio.pause();
+  }
+  function seekBy(d){ if(isFinite(audio.duration)&&audio.duration) audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+d)); }
+  $('vaPlay').addEventListener('click',togglePlay);
+  $('vaPrev').addEventListener('click',prevTrack);
+  $('vaNext').addEventListener('click',nextTrack);
+  $('vaReplay').addEventListener('click',function(){ if(!audio.src) return; audio.currentTime=0; playCounted=false; audio.play().catch(function(){}); });
+  audio.addEventListener('play',function(){
+    $('vaPlay').textContent='⏸';
+    if(!playCounted && cur){
+      playCounted=true;
+      cur.plays=(store.plays[cur.id]||0)+1; store.plays[cur.id]=cur.plays;
+      save(); renderNow(); updateStats(); renderPlaylist();
+    }
+  });
+  audio.addEventListener('pause',function(){ $('vaPlay').textContent='▶'; });
+  audio.addEventListener('ended',function(){ if(cur && annotatedByMe(cur)) nextTrack(); });
+  audio.addEventListener('loadedmetadata',function(){ $('vaTdur').textContent=fmtTime(audio.duration); });
+  audio.addEventListener('timeupdate',function(){
+    if(!progDrag && isFinite(audio.duration) && audio.duration>0){
+      var p=audio.currentTime/audio.duration;
+      if(cur && p>(heard[cur.id]||0)) heard[cur.id]=p;
+      $('vaProg').value=Math.round(p*1000);
+      $('vaProg').style.setProperty('--p',(p*100).toFixed(2)+'%');
+      $('vaTcur').textContent=fmtTime(audio.currentTime);
+    }
+  });
+  $('vaProg').addEventListener('pointerdown',function(){ progDrag=true; });
+  $('vaProg').addEventListener('pointerup',function(){ progDrag=false; });
+  $('vaProg').addEventListener('input',function(){
+    this.style.setProperty('--p',(this.value/10)+'%');
+    if(isFinite(audio.duration)&&audio.duration>0) audio.currentTime=this.value/1000*audio.duration;
+  });
+  $('vaVol').addEventListener('input',function(){ audio.volume=this.value/100; this.style.setProperty('--p',this.value+'%'); });
+  audio.volume=0.9; $('vaVol').style.setProperty('--p','90%');
+
+  /* ---------- VA 画布 ---------- */
+  var PAL={
+    pos:'#3ddc97', neg:'#fb6c7d',
+    quads:[
+      {c:'rgba(56,189,248,.10)', t:'#7dd3fc', cl:'rgba(56,189,248,.20)', tl:'#0369a1', h:'积极 · 激动', s:'兴奋 / 喜悦 / 活力', e:'🔆'},
+      {c:'rgba(251,113,133,.09)', t:'#fda4af', cl:'rgba(251,113,133,.17)', tl:'#be123c', h:'消极 · 激动', s:'紧张 / 愤怒 / 刺激', e:'⚡'},
+      {c:'rgba(148,163,184,.06)', t:'#94a3b8', cl:'rgba(148,163,184,.15)', tl:'#475569', h:'消极 · 平静', s:'低落 / 忧伤 / 慵懒', e:'🌧'},
+      {c:'rgba(61,220,151,.08)', t:'#6ee7b7', cl:'rgba(61,220,151,.18)', tl:'#047857', h:'积极 · 平静', s:'放松 / 惬意 / 舒缓', e:'🍃'}
+    ]
+  };
+  /* 画布配色：深色 / 浅色两套 */
+  var CV={
+    dark:{bg1:'#0d1220',bg2:'#080b12',grid:'rgba(255,255,255,.035)',grid2:'rgba(255,255,255,.07)',
+      axis:'rgba(255,255,255,.22)',axisDot:'rgba(255,255,255,.32)',label:'rgba(255,255,255,.42)',
+      neutral:'rgba(255,255,255,.11)',cross:'rgba(255,255,255,.22)',crossDot:'rgba(255,255,255,.55)',
+      pillBg:'rgba(10,13,20,.92)',pillLine:'rgba(255,255,255,.5)',sub:'#8b93a7',border:'rgba(255,255,255,.06)',
+      anchorLine:'rgba(139,92,246,.6)',anchorTxt:'#c4b5fd'},
+    light:{bg1:'#ffffff',bg2:'#f4f7fc',grid:'rgba(15,23,42,.05)',grid2:'rgba(15,23,42,.11)',
+      axis:'rgba(15,23,42,.28)',axisDot:'rgba(15,23,42,.45)',label:'rgba(15,23,42,.55)',
+      neutral:'rgba(15,23,42,.14)',cross:'rgba(15,23,42,.18)',crossDot:'rgba(15,23,42,.45)',
+      pillBg:'rgba(255,255,255,.96)',pillLine:'rgba(15,23,42,.35)',sub:'#64748b',border:'rgba(15,23,42,.10)',
+      anchorLine:'rgba(124,92,247,.7)',anchorTxt:'#6d4ff0'}
+  };
+  function cvT(){ return CV[theme]||CV.dark; }
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+  function pill(px,py,text,color,bg){
+    ctx.font='700 11px '+FZ;
+    var w=ctx.measureText(text).width+14, h=20, x=px-w/2, y=py-h/2;
+    ctx.fillStyle=bg||'rgba(10,13,20,.92)'; rr(x,y,w,h,10); ctx.fill();
+    ctx.strokeStyle=color; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(text,px,py+.5);
+  }
+  function sizeCanvas(){
+    var r=cv.getBoundingClientRect(); if(r.width<10) return;
+    var dpr=window.devicePixelRatio||1;
+    cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+    drawVA();
+  }
+  function quadName(p){
+    var cx=Math.abs(p.x-0.5), cy=Math.abs(p.y-0.5);
+    if(cx<0.06 && cy<0.06) return '中性';
+    return (p.x>=0.5?'积极':'消极')+' · '+(p.y<0.5?'激动':'平静');
+  }
+  function drawVA(){
+    var T=cvT();
+    var dpr=window.devicePixelRatio||1, W=cv.width/dpr, H=cv.height/dpr;
+    if(!(W>10)) return;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+
+    /* 底 */
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,T.bg1); g.addColorStop(1,T.bg2);
+    ctx.fillStyle=g; rr(0,0,W,H,19); ctx.fill();
+
+    /* 四象限染色 */
+    ctx.save(); rr(1,1,W-2,H-2,18); ctx.clip();
+    var cen=[[0.75,0.25],[0.25,0.25],[0.25,0.75],[0.75,0.75]];
+    PAL.quads.forEach(function(q,i){
+      var cx=cen[i][0]*W, cy=cen[i][1]*H, R=Math.max(W,H)*0.62;
+      var rg=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+      rg.addColorStop(0,theme==='light'?q.cl:q.c); rg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
+    });
+    /* 网格 */
+    ctx.strokeStyle=T.grid; ctx.lineWidth=1;
+    for(var i=1;i<20;i++){
+      if(i===10) continue;
+      var x=Math.round(W*i/20)+.5, y=Math.round(H*i/20)+.5;
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+    ctx.strokeStyle=T.grid2;
+    for(var k=1;k<4;k++){
+      var mx=Math.round(W*k/4)+.5, my=Math.round(H*k/4)+.5;
+      ctx.beginPath(); ctx.moveTo(mx,0); ctx.lineTo(mx,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,my); ctx.lineTo(W,my); ctx.stroke();
+    }
+    ctx.restore();
+
+    /* 象限文案 */
+    var pad=17;
+    var layout=[{a:'left',b:'top',x:pad,y:pad},{a:'right',b:'top',x:W-pad,y:pad},{a:'left',b:'bottom',x:pad,y:H-pad},{a:'right',b:'bottom',x:W-pad,y:H-pad}];
+    PAL.quads.forEach(function(q,i){
+      var L=layout[i];
+      ctx.textAlign=L.a; ctx.textBaseline=L.b;
+      ctx.font='600 12px '+FZ; ctx.fillStyle=(theme==='light'?q.tl:q.t); ctx.globalAlpha=.9;
+      ctx.fillText(q.e+'  '+q.h,L.x,L.y);
+      ctx.globalAlpha=.55; ctx.font='10.5px '+FZ; ctx.fillStyle=T.sub;
+      ctx.fillText(q.s,L.x,L.y+(L.b==='top'?17:-17));
+      ctx.globalAlpha=1;
+    });
+
+    /* 主轴 */
+    var PAD=52;
+    ctx.strokeStyle=T.axis; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(W/2,PAD); ctx.lineTo(W/2,H-PAD);
+    ctx.moveTo(PAD,H/2); ctx.lineTo(W-PAD,H/2);
+    ctx.stroke();
+    ctx.fillStyle=T.axisDot;
+    var ah=function(x,y,dir){ ctx.beginPath();
+      if(dir==='up'){ ctx.moveTo(x,y); ctx.lineTo(x-4,y+8); ctx.lineTo(x+4,y+8); }
+      else { ctx.moveTo(x,y); ctx.lineTo(x-8,y-4); ctx.lineTo(x-8,y+4); }
+      ctx.fill(); };
+    ah(W/2,PAD,'up'); ah(W-PAD,H/2,'right');
+
+    ctx.font='600 10.5px '+FZ; ctx.fillStyle=T.label;
+    ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('唤醒度 AROUSAL',W/2,PAD-8);
+    ctx.textBaseline='top'; ctx.fillText('平静',W/2,H-PAD+9);
+    ctx.save(); ctx.translate(PAD-10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('效价 VALENCE',0,0); ctx.restore();
+    ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('消极',PAD,H/2+9);
+    ctx.textAlign='right'; ctx.fillText('积极',W-PAD,H/2+9);
+
+    /* 中性圈 */
+    ctx.strokeStyle=T.neutral; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.arc(W/2,H/2,Math.min(W,H)*0.07,0,7); ctx.stroke(); ctx.setLineDash([]);
+
+    /* 悬停预览 */
+    if(hoverPos && !dragging){
+      var hx=hoverPos.x*W, hy=hoverPos.y*H;
+      ctx.save();
+      ctx.setLineDash([2,5]); ctx.strokeStyle=T.cross; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(hx,0); ctx.lineTo(hx,H); ctx.moveTo(0,hy); ctx.lineTo(W,hy); ctx.stroke();
+      ctx.restore();
+      if(!anchor){
+        ctx.strokeStyle=T.crossDot; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(hx,hy,7,0,7); ctx.stroke();
+      }
+      var hv=hoverPos.x*2-1, ha=(1-hoverPos.y)*2-1;
+      pill(Math.min(W-52,Math.max(52,hx)), Math.max(16,hy-22), fmtV(hv)+' / '+fmtV(ha), T.pillLine, T.pillBg);
+    }
+
+    /* 锚点 */
+    if(anchor){
+      var px=anchor.x*W, py=anchor.y*H;
+      ctx.save();
+      ctx.setLineDash([5,4]); ctx.strokeStyle=T.anchorLine; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,H/2); ctx.moveTo(px,py); ctx.lineTo(W/2,py); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle='rgba(139,92,246,.35)';
+      ctx.beginPath(); ctx.arc(px,H/2,3.4,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(W/2,py,3.4,0,7); ctx.fill();
+
+      var av=anchor.x*2-1, aa=(1-anchor.y)*2-1;
+      pill(px, H/2 + (py<H/2?15:-15), fmtV(av), T.anchorTxt, T.pillBg);
+      pill(W/2 + (px<W/2?-30:30), py, fmtV(aa), T.anchorTxt, T.pillBg);
+
+      var pulse=(performance.now()%2200)/2200, pr=11+pulse*14;
+      ctx.strokeStyle='rgba(139,92,246,'+(0.42*(1-pulse)).toFixed(3)+')'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(px,py,pr,0,7); ctx.stroke();
+
+      ctx.shadowColor='rgba(139,92,246,.95)'; ctx.shadowBlur=22;
+      ctx.fillStyle='#8b5cf6'; ctx.beginPath(); ctx.arc(px,py,8,0,7); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(px,py,8,0,7); ctx.stroke();
+      ctx.restore();
+    }
+
+    /* 边框 */
+    ctx.strokeStyle=T.border; ctx.lineWidth=1; rr(.5,.5,W-1,H-1,19); ctx.stroke();
+  }
+  (function tick(){
+    if(anchor && !document.hidden) drawVA();
+    requestAnimationFrame(tick);
+  })();
+
+  function evPos(e){
+    var r=cv.getBoundingClientRect();
+    return { x:clamp((e.clientX-r.left)/r.width), y:clamp((e.clientY-r.top)/r.height) };
+  }
+  function setAnchor(p){
+    anchor=p; if(cur){ anchors[cur.id]=anchor; saveDraft(); }
+    updateReadouts(); drawVA();
+  }
+  cv.addEventListener('pointerdown',function(e){
+    if(!tracks.length) return;
+    e.preventDefault(); setAnchor(evPos(e)); dragging=true;
+    try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  cv.addEventListener('pointermove',function(e){
+    hoverPos=evPos(e);
+    if(dragging) setAnchor(hoverPos); else drawVA();
+  });
+  cv.addEventListener('pointerup',function(){ dragging=false; });
+  cv.addEventListener('pointerleave',function(){ hoverPos=null; drawVA(); });
+  function nudge(dx,dy){
+    if(!anchor) anchor={x:0.5,y:0.5};
+    setAnchor({x:clamp(anchor.x+dx),y:clamp(anchor.y+dy)});
+  }
+
+  /* ---------- 读数 ---------- */
+  function updateReadouts(){
+    var q=$('vaQuadText'), dot=document.querySelector('#vaQuad .qdot');
+    if(!anchor){
+      if(editingId){
+        var r=recById(editingId);
+        q.textContent = r ? '编辑模式：正在修改这条记录（'+recTime(r.saved_at)+'）的分数' : '编辑模式';
+      } else q.textContent='听完音乐 → 在图中点一下（可拖动微调）→ 保存';
+      dot.style.background='var(--txt-4)';
+    }else{
+      var name=quadName(anchor);
+      q.textContent=name+' · V='+fmtV(anchor.x*2-1)+'  A='+fmtV((1-anchor.y)*2-1);
+      dot.style.background = name==='中性' ? 'var(--txt-2)' : (anchor.x>=0.5 ? (anchor.y<0.5?'var(--info)':'var(--good)') : 'var(--bad)');
+    }
+    var btn=$('vaSave'), miss=missing(), st=+store.settings.strict||0, hr=cur?(heard[cur.id]||0):0;
+    btn.disabled=!cur;
+    btn.classList.toggle('edit',!!editingId);
+    btn.innerHTML=(editingId?'更新这条标注':(miss.length?('还差：'+miss.join('、')):'保存并下一条'))+' <kbd>S</kbd>';
+    if(cur && st>0){
+      q.textContent += (hr>=st ? (' · 已听 '+Math.round(hr*100)+'% ✅')
+                               : (' · 已听 '+Math.round(hr*100)+'%，需听满 '+Math.round(st*100)+'%'));
+    }
+    $('vaCancelEdit').hidden=!editingId;
+    $('vaClearAnchor').disabled=!anchor;
+    /* 编辑状态提示并入这一行文案（原独立黄条已删，给画布腾空间） */
+    var r2=editingId&&recById(editingId);
+    if(r2) q.textContent+=' · 原值 V='+fmtV(r2.valence)+' A='+fmtV(r2.arousal)+'，保存即覆盖这条';
+  }
+  function recById(id){ for(var i=0;i<store.records.length;i++) if(store.records[i].record_id===id) return store.records[i]; return null; }
+
+  /* ---------- 渲染 ---------- */
+  function renderNow(){
+    var title=$('vaNowTitle');
+    if(!cur){ title.textContent='导入音频后开始标注'; title.classList.add('placeholder'); $('vaNowChips').innerHTML=''; return; }
+    title.classList.remove('placeholder');
+    var m=effMeta(cur), parts=[];
+    if(m.country) parts.push(['🌍',m.country]);
+    if(m.style) parts.push(['🎼',m.style]);
+    if(m.track) parts.push(['曲目','#'+m.track]);
+    if(m.segment) parts.push(['片段','#'+m.segment]);
+    if(m.lyric) parts.push(['歌词段','#'+m.lyric]);
+    if(m.source) parts.push(['来源',m.source]);
+    title.textContent=cur.name.replace(/\.[a-z0-9]+$/i,'');
+    var html=parts.map(function(p){ return '<span class="va-chip">'+esc(p[0])+' '+esc(p[1])+'</span>'; }).join('');
+    html+='<span class="va-chip">▶ 播放 <b>'+(cur.plays||0)+'</b> 次</span>';
+    var rt=ratersOf(cur.id); if(rt) html+='<span class="va-chip">👥 <b>'+rt+'</b> 人标过</span>';
+    html+='<span class="va-chip">第 <b>'+(curIndex+1)+'/'+tracks.length+'</b></span>';
+    $('vaNowChips').innerHTML=html;
+  }
+  function visibleTracks(){
+    return tracks.map(function(t,i){ return {t:t,i:i}; }).filter(function(o){
+      if(filter==='todo') return !annotatedByMe(o.t);
+      if(filter==='done') return annotatedByMe(o.t);
+      return true;
+    });
+  }
+  function renderPlaylist(){
+    $('vaPlCount').textContent=tracks.length;
+    var el=$('vaPlaylist'), list=visibleTracks();
+    if(!tracks.length){
+      el.innerHTML='<div class="va-empty"><b>🎵</b>还没有音频<br>点上方「＋ 添加音频文件」或拖文件进窗口<br>也可以先随便点几首示例熟悉流程</div>';
+      return;
+    }
+    if(!list.length){
+      el.innerHTML='<div class="va-empty">'+(filter==='todo'?'✅ 这个筛选下没有条目了':'还没有标注记录')+'</div>';
+      return;
+    }
+    el.innerHTML=list.map(function(o){
+      var t=o.t, m=effMeta(t), done=annotatedByMe(t), rt=ratersOf(t.id), r=myRec(t.id);
+      var bits=[m.country,m.style,m.track?('曲'+m.track):'',m.segment?('段'+m.segment):''].filter(Boolean).join(' · ');
+      var mine=r?(' · 我 V'+fmtV(r.valence)+' A'+fmtV(r.arousal)):'';
+      return '<div class="va-item'+(o.i===curIndex?' cur':'')+(done?' done':'')+'" data-id="'+esc(t.id)+'">'
+        +'<div class="va-itemname"><i>'+esc(String(o.i+1))+'. </i>'+esc(t.name.replace(/\.[a-z0-9]+$/i,''))+'</div>'
+        +'<div class="va-itemmeta">'+esc(bits||'字段未识别，可在中下方手动修正')+esc(' · ▶'+(t.plays||0)+(rt?' · 👥'+rt+'人':'')+mine)+'</div>'
+        +(done?'<span class="va-badge">✓</span>':'')
+        +'<button class="va-del" type="button" title="移出曲库（不动电脑文件，不删已存分数）">✕</button></div>';
+    }).join('');
+    var c=el.querySelector('.cur'); if(c) c.scrollIntoView({block:'nearest'});
+  }
+  $('vaPlaylist').addEventListener('click',function(e){
+    var del=e.target.closest('.va-del');
+    if(del){ removeTrack(del.closest('.va-item').dataset.id); return; }
+    var it=e.target.closest('.va-item'); if(!it) return;
+    var i=tracks.findIndex(function(t){ return t.id===it.dataset.id; });
+    if(i>=0) selectTrack(i);   /* 重复打分确认在 selectTrack 内统一处理 */
+  });
+  function updateStats(){
+    var total=store.records.length;
+    var mine=store.records.filter(function(r){ return r.annotator_name===myName(); }).length;
+    var done=tracks.filter(annotatedByMe).length;
+    var todo=tracks.length-done;
+    var heard=tracks.filter(function(t){ return (t.plays||0)>0; }).length;
+    var pct=tracks.length?Math.round(done/tracks.length*100):0;
+
+    $('vaTopStats').innerHTML='<span>曲库 <b>'+tracks.length+'</b></span><span>我的记录 <b>'+mine+'</b></span><span>总记录 <b>'+total+'</b></span><span>标注人 <b>'+esc(myName())+'</b></span>';
+    $('vaRailFill').style.width=pct+'%';
+    $('vaRailText').textContent=pct+'%';
+    $('vaWhoTag').textContent=store.profile.name?('标注人 '+store.profile.name):'未填姓名';
+    $('vaStats').innerHTML=
+      '<div class="va-stat acc"><span>已完成</span><b>'+done+'</b></div>'+
+      '<div class="va-stat"><span>待标注</span><b>'+todo+'</b></div>'+
+      '<div class="va-stat"><span>我的记录</span><b>'+mine+'</b></div>'+
+      '<div class="va-stat good"><span>已听过</span><b>'+heard+'</b></div>';
+    $('vaFootStats').textContent='完成 '+done+'/'+tracks.length+' · 待标 '+todo+' 首';
+    $('vaRecBtn').innerHTML='🗂 我的记录'+(mine?' '+mine:'');
+  }
+  function refresh(){ renderNow(); renderPlaylist(); updateStats(); updateReadouts(); renderLikert(); renderRecords(); fitCanvas(); drawVA(); }
+
+  /* ---------- 保存 / 更新 ---------- */
+  function saveAndNext(){
+    if(!cur) return;
+    if(!anchor){ toast('先在 VA 图里点一下情感位置','bad'); return; }
+    var miss=missing();
+    if(miss.length){
+      var di=dims().findIndex(function(d){ return lk[d.key]==null; });
+      if(di>=0) activeDim=di;
+      renderLikert(); toast('还没完成：'+miss.join('、'),'bad'); return;
+    }
+    var st=+store.settings.strict||0, hr=heard[cur.id]||0;
+    if(st>0 && hr<st){ toast('请先听完 '+Math.round(st*100)+'% 再打分（当前 '+Math.round(hr*100)+'%）','bad'); return; }
+
+    var m=effMeta(cur), now=new Date().toISOString();
+    var vals={
+      audio_id:cur.id, file_name:cur.name,
+      country:m.country, style:m.style, track_no:m.track, segment_no:m.segment, lyric_no:m.lyric, source:m.source,
+      valence:+(anchor.x*2-1).toFixed(4), arousal:+((1-anchor.y)*2-1).toFixed(4),
+      x:+anchor.x.toFixed(4), y:+anchor.y.toFixed(4),
+      likert:JSON.parse(JSON.stringify(lk)), heard_ratio:+hr.toFixed(3),
+      play_count:cur.plays||0, elapsed_ms:Math.round(performance.now()-trackStartAt), saved_at:now
+    };
+    if(editingId && recById(editingId)){
+      var r=recById(editingId);
+      var dv=Math.abs(r.valence-vals.valence), da=Math.abs(r.arousal-vals.arousal);
+      Object.assign(r,vals);
+      r.updated_at=now;
+      if(!r.first_saved_at) r.first_saved_at=r.saved_at;
+      /* 新旧分差异大时给个显式提醒，方便复核是不是误操作 */
+      toast(((dv>0.5||da>0.5)?'⚠ 这次和上次分数差别较大，已记下修改时间 · ':'')+'✓ 已更新记录 '+r.record_id,'ok');
+    }else{
+      var rec=Object.assign({
+        record_id:'R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),
+        annotator_name:myName(), annotator_age:store.profile.age||'', annotator_gender:store.profile.gender||'',
+        annotator_hometown:store.profile.hometown||'', annotator_mbti:store.profile.mbti||'',
+        annotator_instrument:store.profile.instrument||'', annotator_listen:store.profile.listen||'',
+        user_agent:navigator.userAgent
+      },vals);
+      store.records.push(rec);
+      pushRemote(rec).then(function(ok){
+        if(!ok && (store.settings.apiUrl||'').trim()){ store.queue.push(rec); save(); renderSync(); }
+      });
+      toast(store.profile.name?('✓ 已保存 V='+fmtV(rec.valence)+' A='+fmtV(rec.arousal)+(dims().length?(' · '+dims().length+' 项打分'):'')):('✓ 已保存（建议先在右侧填写姓名）'),'ok');
+    }
+    save();
+    var btn=$('vaSave'); btn.classList.add('flash'); setTimeout(function(){ btn.classList.remove('flash'); },520);
+    delete anchors[cur.id]; delete store.drafts[cur.id];
+    anchor=null; lk={}; activeDim=0; editingId=null;
+    nextTrack();
+  }
+  $('vaSave').addEventListener('click',saveAndNext);
+  $('vaClearAnchor').addEventListener('click',function(){
+    if(!cur) return;
+    delete anchors[cur.id]; anchor=null; editingId=null; saveDraft();
+    updateReadouts(); drawVA(); toast('已清除这个打分');
+  });
+  $('vaSkip').addEventListener('click',function(){ nextTrack(); });
+  $('vaCancelEdit').addEventListener('click',function(){
+    var r=editingId&&recById(editingId);
+    if(r){ anchors[cur.id]={x:r.x,y:r.y}; anchor={x:r.x,y:r.y}; }
+    editingId=null; updateReadouts(); drawVA(); renderPlaylist(); toast('已退出编辑模式，记录未改动');
+  });
+  $('vaUndo').addEventListener('click',function(){
+    for(var i=store.records.length-1;i>=0;i--){
+      if(store.records[i].annotator_name===myName()){
+        var r=store.records.splice(i,1)[0];
+        if(editingId===r.record_id){ editingId=null; anchor=null; }
+        save(); refresh(); toast('已撤销 '+r.record_id); return;
+      }
+    }
+    toast('没有找到你的标注记录');
+  });
+  $('vaClear').addEventListener('click',function(){
+    if(!store.records.length){ toast('暂无数据'); return; }
+    if(!confirm('确定清空全部标注数据？（曲库与个人信息保留）')) return;
+    store.records=[]; store.plays={}; store.overrides={}; store.drafts={}; store.queue=[];
+    Object.keys(store.heard).forEach(function(k){ delete store.heard[k]; });
+    editingId=null; anchor=null; lk={};
+    tracks.forEach(function(t){ t.plays=0; });
+    save(); refresh(); toast('已清空全部数据','ok');
+  });
+
+  /* ---------- 导出 / 导入 ---------- */
+  var BASE_COLS=['record_id','audio_id','file_name','country','style','track_no','segment_no','lyric_no','source',
+    'annotator_name','annotator_age','annotator_gender','annotator_hometown','annotator_mbti',
+    'annotator_instrument','annotator_listen',
+    'valence','arousal','x','y','heard_ratio','play_count','elapsed_ms','saved_at','updated_at','synced','user_agent'];
+  function likertKeys(){
+    var seen={}, out=[];
+    dims().forEach(function(d){ if(!seen[d.key]){ seen[d.key]=1; out.push(d.key); } });
+    store.records.forEach(function(r){ if(r.likert) Object.keys(r.likert).forEach(function(k){ if(!seen[k]){ seen[k]=1; out.push(k); } }); });
+    return out;
+  }
+  function allCols(){ return BASE_COLS.concat(likertKeys().map(function(k){ return 'lk_'+k; })); }
+  function cellOf(r,c){
+    if(c.indexOf('lk_')===0) return csvCell(r.likert?r.likert[c.slice(3)]:'');
+    return csvCell(r[c]);
+  }
+  function csvCell(v){ v=(v==null)?'':String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  function needData(){ if(!store.records.length){ toast('暂无标注数据'); return false; } return true; }
+  function expCsv(){
+    if(!needData()) return;
+    var cols=allCols(), lines=[cols.join(',')];
+    store.records.forEach(function(r){ lines.push(cols.map(function(c){ return cellOf(r,c); }).join(',')); });
+    dl(new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv'}),'VA标注_'+stamp()+'.csv');
+    toast('CSV 已导出（'+store.records.length+' 条 × '+cols.length+' 列）','ok');
+  }
+  function expLong(){
+    if(!needData()) return;
+    var L=['record_id','audio_id','file_name','annotator_name','country','style','source','item','value','saved_at'], out=[L.join(',')];
+    store.records.forEach(function(r){
+      ['valence','arousal'].forEach(function(k){
+        out.push([r.record_id,r.audio_id,r.file_name,r.annotator_name,r.country,r.style,r.source,k,r[k],r.saved_at].map(csvCell).join(','));
+      });
+      likertKeys().forEach(function(k){
+        if(r.likert && r.likert[k]!=null)
+          out.push([r.record_id,r.audio_id,r.file_name,r.annotator_name,r.country,r.style,r.source,'lk_'+k,r.likert[k],r.saved_at].map(csvCell).join(','));
+      });
+    });
+    dl(new Blob(['\uFEFF'+out.join('\n')],{type:'text/csv'}),'VA长表_'+stamp()+'.csv');
+    toast('长表已导出（'+out.length+' 行，一行一评分项）','ok');
+  }
+  function expCode(){
+    var rows=[['column','label','含义','取值范围 / 单位']];
+    [['record_id','记录编号','每条标注的唯一 ID','R-xxx'],
+     ['audio_id','音频编号','由文件名+大小生成，同一音频跨人一致','A-xxx'],
+     ['file_name','文件名','音频原始文件名','文本'],
+     ['country','国家/地区','文件名解析或手动修正','文本'],
+     ['style','风格','同上','文本'],
+     ['track_no','曲目号','同上','整数'],
+     ['segment_no','片段号','同上','整数'],
+     ['lyric_no','歌词段号','同上','整数'],
+     ['source','来源','音源属性','AI生成 / 真人'],
+     ['annotator_name','标注人','区分不同标注人','文本'],
+     ['annotator_age','年龄','','整数'],
+     ['annotator_gender','性别','','分类'],
+     ['annotator_hometown','家乡','','文本'],
+     ['annotator_mbti','MBTI','','分类'],
+     ['annotator_instrument','乐器学习年限','音乐训练背景','分类'],
+     ['annotator_listen','每天听歌时长','音乐暴露量','分类'],
+     ['valence','效价 Valence','消极 → 积极','−1 ~ +1'],
+     ['arousal','唤醒度 Arousal','平静 → 激动','−1 ~ +1'],
+     ['x','画布横坐标','点击位置','0 ~ 1'],
+     ['y','画布纵坐标','点击位置，越小越激动','0 ~ 1'],
+     ['heard_ratio','实际听过比例','保存时该曲听过的最高进度','0 ~ 1'],
+     ['play_count','播放次数','该曲累计播放次数','整数'],
+     ['elapsed_ms','停留时长','选中该曲到保存的毫秒数','毫秒'],
+     ['saved_at','保存时间','','ISO 8601'],
+     ['updated_at','修改时间','编辑过才有','ISO 8601'],
+     ['synced','同步状态','是否已推送到后端','1 已同步 / 0 仅本地']
+    ].forEach(function(r){ rows.push(r); });
+    dims().forEach(function(d){
+      rows.push(['lk_'+d.key, d.label+(d.en?' ('+d.en+')':''), 'Likert 打分：'+d.lo+' → '+d.hi, '1 ~ '+d.scale+' 整数']);
+    });
+    rows.push(['user_agent','浏览器标识','排查环境用','文本']);
+    dl(new Blob(['\uFEFF'+rows.map(function(r){ return r.map(csvCell).join(','); }).join('\n')],{type:'text/csv'}),'VA变量说明_'+stamp()+'.csv');
+    toast('变量说明已导出（'+rows.length+' 行）','ok');
+  }
+  function expJson(){
+    if(!needData()) return;
+    dl(new Blob([JSON.stringify(store.records,null,2)],{type:'application/json'}),'VA标注_'+stamp()+'.json');
+    toast('JSON 已导出（'+store.records.length+' 条）','ok');
+  }
+  function expBackup(){
+    var pack={schema:'va-annotator-backup',version:1,exported_at:new Date().toISOString(),
+      records:store.records,overrides:store.overrides,plays:store.plays,profile:store.profile};
+    dl(new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),'VA完整备份_'+stamp()+'.json');
+    toast('完整备份已导出','ok');
+  }
+  /* 导出菜单精简为两项：CSV（同学交作业用）+ 备份 JSON（换设备用）。
+     长表 / 变量说明 / 纯记录 JSON 的函数仍保留在下方，老师若需要可把按钮加回菜单 */
+  $('vaExpCsv').addEventListener('click',function(){ expCsv(); closeMenu(); });
+  $('vaExpBackup').addEventListener('click',function(){ expBackup(); closeMenu(); });
+  $('vaExpBackup2').addEventListener('click',expBackup);
+  $('vaExpBtn').addEventListener('click',function(e){ e.stopPropagation(); $('vaExpMenu').classList.toggle('open'); });
+  function closeMenu(){ $('vaExpMenu').classList.remove('open'); }
+  document.addEventListener('click',closeMenu);
+
+  /* 导入：支持完整备份对象、纯记录数组、导出 CSV 之外的 JSON 变体 */
+  function importJson(text){
+    var data;
+    try{ data=JSON.parse(text); }catch(e){ toast('文件不是合法 JSON','bad'); return; }
+    var addRec=0, addOv=0, addPl=0;
+    var incoming = Array.isArray(data) ? data : (data.records||null);
+    if(!incoming && !Array.isArray(data)){
+      if(!data.plays && !data.overrides){ toast('没找到可导入的标注数据','bad'); return; }
+      incoming=[];
+    }
+    var byId={}; store.records.forEach(function(r){ byId[r.record_id]=1; });
+    incoming.forEach(function(r){
+      if(!r||typeof r!=='object'||r.valence==null||r.arousal==null) return;
+      if(!r.record_id) r.record_id='R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6);
+      if(byId[r.record_id]) return;
+      byId[r.record_id]=1; store.records.push(r); addRec++;
+    });
+    if(data&&data.overrides) Object.keys(data.overrides).forEach(function(k){ if(!store.overrides[k]){ store.overrides[k]=data.overrides[k]; addOv++; } });
+    if(data&&data.plays) Object.keys(data.plays).forEach(function(k){ store.plays[k]=Math.max(store.plays[k]||0,data.plays[k]||0); addPl++; });
+    if(data&&data.profile&&!store.profile.name&&data.profile.name) store.profile=data.profile;
+    save(); loadProfile(); refresh();
+    toast('导入完成：新增 '+addRec+' 条记录'+(addOv?'，字段修正 '+addOv:'')+(addPl?'，播放计数 '+addPl+' 项':''),'ok');
+  }
+  function bindImport(btnId){
+    $(btnId).addEventListener('click',function(){ $('vaImpFile').click(); });
+  }
+  bindImport('vaImpBtn'); bindImport('vaImpBtn2');
+  $('vaImpFile').addEventListener('change',function(e){
+    var f=e.target.files[0]; if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){ importJson(String(fr.result||'')); };
+    fr.onerror=function(){ toast('文件读取失败','bad'); };
+    fr.readAsText(f); e.target.value='';
+  });
+
+  /* ---------- 后端同步（可选，留空则纯本地） ---------- */
+  function pushRemote(rec){
+    var url=(store.settings.apiUrl||'').trim();
+    if(!url) return Promise.resolve(false);
+    return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({schema:'va-annotator-record',version:2,sent_at:new Date().toISOString(),record:rec})})
+      .then(function(r){ return r.ok; }).catch(function(){ return false; });
+  }
+  function renderSync(){
+    var el=$('vaSyncState'), url=(store.settings.apiUrl||'').trim();
+    if(!url){ el.innerHTML='当前 <b>仅本地存储</b>（浏览器 localStorage）。填上后端地址后，每条标注会自动推送一份。'; return; }
+    el.innerHTML='后端 <b>'+esc(url)+'</b> · 待同步 <b>'+store.queue.length+'</b> 条'+(store.queue.length?'（可点「重试同步」再推一次）':' ✅');
+  }
+  function syncQueue(){
+    var q=store.queue.slice();
+    if(!q.length){ toast('没有待同步的记录'); renderSync(); return; }
+    var left=[], chain=Promise.resolve();
+    q.forEach(function(rec){
+      chain=chain.then(function(){
+        return pushRemote(rec).then(function(ok){ rec.synced=ok?1:0; if(!ok) left.push(rec); });
+      });
+    });
+    chain.then(function(){ store.queue=left; save(); renderSync();
+      toast(left.length?('还有 '+left.length+' 条未同步'):'☁ 全部已同步至后端','ok'); });
+  }
+  $('vaSyncBtn').addEventListener('click',syncQueue);
+
+  /* ---------- 曲库缓存（IndexedDB，刷新不丢音频） ---------- */
+  var IDB=null;
+  function idbOpen(){
+    return new Promise(function(res,rej){
+      if(!window.indexedDB){ rej(new Error('no-idb')); return; }
+      var rq;
+      try{ rq=indexedDB.open('va_lib',1); }catch(e){ rej(e); return; }
+      rq.onupgradeneeded=function(){ var db=rq.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files',{keyPath:'id'}); };
+      rq.onsuccess=function(){ IDB=rq.result; res(IDB); };
+      rq.onerror=function(){ rej(rq.error||new Error('idb-error')); };
+    });
+  }
+  function idbPut(o){
+    if(!IDB) return Promise.resolve(false);
+    return new Promise(function(res){
+      try{ var tx=IDB.transaction('files','readwrite'); tx.objectStore('files').put(o);
+        tx.oncomplete=function(){ res(true); }; tx.onerror=function(){ res(false); }; }
+      catch(e){ res(false); }
+    });
+  }
+  function idbAll(){
+    if(!IDB) return Promise.resolve([]);
+    return new Promise(function(res){
+      try{ var tx=IDB.transaction('files','readonly'), rq=tx.objectStore('files').getAll();
+        rq.onsuccess=function(){ res(rq.result||[]); }; rq.onerror=function(){ res([]); }; }
+      catch(e){ res([]); }
+    });
+  }
+  function idbClear(){
+    if(!IDB) return Promise.resolve(false);
+    return new Promise(function(res){
+      try{ var tx=IDB.transaction('files','readwrite'); tx.objectStore('files').clear();
+        tx.oncomplete=function(){ res(true); }; tx.onerror=function(){ res(false); }; }
+      catch(e){ res(false); }
+    });
+  }
+  function idbDel(id){
+    if(!IDB) return Promise.resolve(false);
+    return new Promise(function(res){
+      try{ var tx=IDB.transaction('files','readwrite'); tx.objectStore('files').delete(id);
+        tx.oncomplete=function(){ res(true); }; tx.onerror=function(){ res(false); }; }
+      catch(e){ res(false); }
+    });
+  }
+  function restoreLib(){
+    if(!store.settings.remember) return;
+    idbOpen().then(idbAll).then(function(list){
+      if(!list || !list.length){
+        if(store.records.length) toast('检测到 '+store.records.length+' 条历史标注，重新导入同一批音频即可继续','ok');
+        return;
+      }
+      var seen={}; tracks.forEach(function(t){ seen[t.id]=1; });
+      var n=0;
+      list.forEach(function(o){
+        if(seen[o.id]||!o.blob) return; seen[o.id]=1;
+        tracks.push({id:o.id,name:o.name,url:URL.createObjectURL(o.blob),parsed:parseName(o.name),plays:store.plays[o.id]||0});
+        n++;
+      });
+      if(n){ refresh(); if(curIndex<0) selectTrack(0); toast('已从本机缓存恢复 '+n+' 首音频','ok'); }
+    }).catch(function(){});
+  }
+  $('vaLibClear').addEventListener('click',function(){
+    if(!confirm('清除浏览器中缓存的音频文件？\n标注记录不受影响，下次需重新导入音频。')) return;
+    idbOpen().then(idbClear).then(function(ok){ toast(ok?'已清除缓存音频':'清除失败（可能本环境不支持缓存）',ok?'ok':'bad'); }).catch(function(){ toast('本环境不支持曲库缓存','bad'); });
+  });
+
+  /* ---------- 设置 ---------- */
+  function applyTheme(t){
+    theme=(t==='light')?'light':'dark';
+    root.setAttribute('data-theme',theme);
+    document.body.style.background=(theme==='light')?'#e7ebf3':'#05070d';
+    $('vaThemeBtn').textContent=(theme==='dark'?'🌙 深色':'☀ 浅色');
+    drawVA();
+  }
+  $('vaThemeBtn').addEventListener('click',function(){
+    applyTheme(theme==='dark'?'light':'dark');
+    store.settings.theme=theme; save();
+    toast('已切换到'+(theme==='dark'?'深色':'浅色')+'模式');
+  });
+  function loadSettings(){
+    $('vaStrict').value=String(store.settings.strict);
+    $('vaApiUrl').value=store.settings.apiUrl||'';
+    $('vaRemember').checked=!!store.settings.remember;
+    applyTheme(store.settings.theme||'light');
+    renderSync();
+  }
+  $('vaStrict').addEventListener('change',function(){
+    store.settings.strict=+this.value; save(); updateReadouts();
+    toast('最少听满：'+(this.value==='0'?'不限制':Math.round(+this.value*100)+'%'));
+  });
+  $('vaApiUrl').addEventListener('input',function(){ store.settings.apiUrl=this.value.trim(); save(); renderSync(); });
+  $('vaRemember').addEventListener('change',function(){
+    store.settings.remember=this.checked; save();
+    toast(this.checked?'已开启曲库缓存：下次打开自动恢复音频':'已关闭曲库缓存');
+  });
+
+  /* ---------- 手动修正字段 ---------- */
+  var FIXIDS={country:'vaFCountry',style:'vaFStyle',track:'vaFTrack',segment:'vaFSeg',lyric:'vaFLyric'};
+  function fillFix(){
+    var m=cur?effMeta(cur):{country:'',style:'',track:'',segment:'',lyric:'',source:''};
+    for(var k in FIXIDS) $(FIXIDS[k]).value=m[k]||'';
+    $('vaFSource').value=m.source||'';
+  }
+  for(var fk in FIXIDS){ (function(k){ $(FIXIDS[k]).addEventListener('input',function(){ applyFix(k); }); })(fk); }
+  $('vaFSource').addEventListener('change',function(){ applyFix('source'); });
+  function applyFix(k){
+    if(!cur) return;
+    var o=store.overrides[cur.id]||(store.overrides[cur.id]={});
+    o[k]=(k==='source'?$('vaFSource').value:$(FIXIDS[k]).value).trim();
+    save(); renderNow(); renderPlaylist();
+  }
+
+  /* ---------- 记录面板（左栏 · 曲库下方，常驻可见） ---------- */
+  var recFilter='mine', recQuery='';
+  function focusRecords(){
+    var p=$('vaRecPanel'); if(!p) return;
+    renderRecords();
+    p.scrollIntoView({behavior:'smooth',block:'nearest'});
+    p.classList.remove('flash'); void p.offsetWidth; p.classList.add('flash');
+    setTimeout(function(){ p.classList.remove('flash'); },1200);
+  }
+  $('vaRecBtn').addEventListener('click',function(){ focusRecords(); });
+  $('vaOpenRec').addEventListener('click',function(){ focusRecords(); });
+  $('vaRecSearch').addEventListener('input',function(){ recQuery=this.value.trim().toLowerCase(); renderRecords(); });
+  $('vaRecFilter').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    recFilter=b.dataset.r;
+    Array.prototype.forEach.call(this.children,function(x){ x.classList.toggle('on',x===b); });
+    renderRecords();
+  });
+  function renderRecords(){
+    var all=store.records.slice().reverse();
+    var list=all.filter(function(r){
+      if(recFilter==='mine' && r.annotator_name!==myName()) return false;
+      if(!recQuery) return true;
+      var hay=(r.file_name+' '+r.country+' '+r.style+' '+r.annotator_name+' '+r.record_id).toLowerCase();
+      return hay.indexOf(recQuery)>=0;
+    });
+    $('vaRecSub').textContent=list.length+' / '+store.records.length+' 条'+(recFilter==='mine'?' · 我的':' · 全部');
+    var el=$('vaRecList');
+    if(!list.length){
+      el.innerHTML='<div class="va-empty">'+(store.records.length?'没有匹配的记录':'还没有任何标注记录<br>先导入音频打一条分试试')+'</div>';
+      return;
+    }
+    el.innerHTML=list.map(function(r){
+      var meta=[r.country,r.style,r.track_no?('曲'+r.track_no):'',r.source].filter(Boolean).join(' · ');
+      var mine=r.annotator_name===myName();
+      return '<div class="va-rec" data-id="'+esc(r.record_id)+'">'
+        +'<div class="va-rec-top"><div style="flex:1;min-width:0">'
+        +'<div class="va-rec-name">'+esc(r.file_name||r.audio_id)+'</div>'
+        +'<div class="va-rec-meta">'+esc((meta||'字段未填')+' · '+recTime(r.saved_at)+(r.updated_at?'（已改）':'')+' · ▶'+(r.play_count||0))+'</div>'
+        +'</div><span class="va-tag'+(mine?'':' other')+'">'+esc(mine?'我':r.annotator_name)+'</span></div>'
+        +'<div class="va-rec-vals">'
+        +'<div class="va-rec-val '+(r.valence>=0?'pos':'neg')+'"><span>效价 V</span><b>'+fmtV(+r.valence)+'</b></div>'
+        +'<div class="va-rec-val '+(r.arousal>=0?'pos':'neg')+'"><span>唤醒 A</span><b>'+fmtV(+r.arousal)+'</b></div>'
+        +dims().map(function(d){ var v=r.likert?r.likert[d.key]:null;
+            return '<div class="va-rec-val"><span>'+esc(d.label)+'</span><b>'+(v==null?'—':v)+'</b></div>'; }).join('')
+        +'<div class="va-rec-val"><span>MBTI</span><b style="font-size:12px">'+esc(r.annotator_mbti||'—')+'</b></div>'
+        +'</div>'
+        +(mine?'<div class="va-rec-act"><button class="va-btn tiny" data-act="edit" type="button">✎ 修改这条</button>'
+          +'<button class="va-btn tiny ghost bad" data-act="del" type="button">🗑 删除</button></div>':'')
+        +'</div>';
+    }).join('');
+  }
+  $('vaRecList').addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]'); if(!b) return;
+    var id=b.closest('.va-rec').dataset.id, r=recById(id); if(!r) return;
+    if(b.dataset.act==='del'){
+      if(!confirm('删除这条记录？\n'+(r.file_name||''))) return;
+      store.records=store.records.filter(function(x){ return x.record_id!==id; });
+      if(editingId===id){ editingId=null; anchor=null; }
+      save(); renderRecords(); refresh(); toast('已删除 '+id);
+    }else{
+      var i=tracks.findIndex(function(t){ return t.id===r.audio_id; });
+      if(i<0){ toast('这首不在当前曲库里，先把对应音频文件导入','bad'); return; }
+      selectTrack(i,true);   /* 显式点了「修改这条」，跳过重复打分确认 */
+      toast('已载入该条标注，改完点「更新这条标注」');
+    }
+  });
+
+  /* ---------- 快捷键弹窗 ---------- */
+  function openModal(on){ $('vaKeys').classList.toggle('on',on); }
+  $('vaKeysBtn').addEventListener('click',function(){ openModal(true); });
+  $('vaKeysClose').addEventListener('click',function(){ openModal(false); });
+
+  /* ---------- 键盘 ---------- */
+  document.addEventListener('keydown',function(e){
+    var t=e.target, tag=(t&&t.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select'||(t&&t.isContentEditable)){
+      if(e.key==='Escape') t.blur();
+      return;
+    }
+    if(tag==='button'&&(e.code==='Space'||e.key==='Enter')) return;
+    var big=e.shiftKey?0.02:0.005;
+    if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
+    else if(e.key==='ArrowRight'){ if(anchor){ e.preventDefault(); nudge(big,0); } else seekBy(5); }
+    else if(e.key==='ArrowLeft'){ if(anchor){ e.preventDefault(); nudge(-big,0); } else seekBy(-5); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); nudge(0,-big); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); nudge(0,big); }
+    else if(/^[1-9]$/.test(e.key)){
+      var dd=dims()[activeDim];
+      if(dd && cur){ e.preventDefault(); setLk(activeDim, Math.min(dd.scale, +e.key)); }
+    }
+    else if(e.key==='Tab'){
+      if(dims().length>1){ e.preventDefault(); activeDim=(activeDim+1)%dims().length; renderLikert(); }
+    }
+    else if(e.key==='n'||e.key==='N') nextTrack();
+    else if(e.key==='p'||e.key==='P') prevTrack();
+    else if(e.key==='s'||e.key==='S') saveAndNext();
+    else if(e.key==='r'||e.key==='R'){ if(audio.src){ audio.currentTime=0; audio.play().catch(function(){}); } }
+    else if(e.key==='x'||e.key==='X') $('vaClearAnchor').click();
+    else if(e.key==='d'||e.key==='D'){ var c=$('vaRand'); c.checked=!c.checked; toast('随机发曲：'+(c.checked?'开':'关')); }
+    else if(e.key==='?'||(e.key==='/'&&e.shiftKey)) openModal(true);
+    else if(e.key==='Escape'){
+      if($('vaKeys').classList.contains('on')) openModal(false);
+      else if(editingId) $('vaCancelEdit').click();
+      else closeMenu();
+    }
+  });
+  /* 点击按钮后移除焦点，避免空格键误触发上一次点击的按钮 */
+  root.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&b!==document.activeElement) return; if(b) b.blur(); });
+
+  /* ---------- 启动 ---------- */
+  /* 画布自适应：桌面端 JS 写显式边长（中栏其余元素占多少，画布就吃多少，整页不滚动）；
+     手机/iPad 竖屏交给纯 CSS 正方（::before padding-top），JS 不执行画布也在 */
+  function fitCanvas(){
+    var box=document.querySelector('.va-vaspace'); if(!box) return;
+    var center=box.parentNode; if(!center) return;
+    /* ≤940px（手机 / iPad 竖屏）：清掉 JS 尺寸 + 去掉 fixed，走 CSS 正方 */
+    if(window.matchMedia && window.matchMedia('(max-width:940px)').matches){
+      box.classList.remove('fixed');
+      if(box.style.width){ box.style.width=''; box.style.height=''; }
+      return;
+    }
+    var others=0, vis=0, i, ch;
+    for(i=0;i<center.children.length;i++){
+      ch=center.children[i];
+      if(ch===box||ch.hidden) continue;
+      others+=ch.offsetHeight; vis++;
+    }
+    var avail=center.clientHeight-others-12*vis-6;   /* 12=flex gap，6=下padding+余量 */
+    var size=Math.floor(Math.min(462,Math.max(240,avail)));
+    if(box.style.width!==size+'px'){
+      box.style.width=size+'px'; box.style.height=size+'px'; box.classList.add('fixed');
+    }
+  }
+  /* 播放条真实高度 → CSS 变量，卡片据此留位（条子换行变高也不会挡内容） */
+  (function(){
+    var bar=document.querySelector('.va-bottom'); if(!bar) return;
+    var set=function(){ document.documentElement.style.setProperty('--player-h',(bar.offsetHeight||58)+'px'); };
+    set();
+    if(window.ResizeObserver){ new ResizeObserver(set).observe(bar); }
+    else { window.addEventListener('resize',set); }
+  })();
+  loadProfile(); updateMbtiLink(); bindProfile();
+  loadSettings(); renderLikert();
+  refresh(); fillFix(); sizeCanvas(); fitCanvas();
+  restoreLib();
+  if(window.ResizeObserver){ new ResizeObserver(sizeCanvas).observe(cv); } else { window.addEventListener('resize',sizeCanvas); }
+  /* 中栏高度变化（窗口缩放 / 展开"手动修正"）→ 重算画布边长，保证不滚动 */
+  var centerEl=document.querySelector('.va-center');
+  if(window.ResizeObserver && centerEl){ new ResizeObserver(fitCanvas).observe(centerEl); }
+  else { window.addEventListener('resize',fitCanvas); }
+  Array.prototype.forEach.call(document.querySelectorAll('.va-center details'),function(d){
+    d.addEventListener('toggle',fitCanvas);
+  });
+})();
+</script>
