@@ -53,12 +53,12 @@
 }
 #va-app[data-theme="light"] .va-warn{color:#92400e;border-bottom-color:rgba(180,83,9,.25);
   background:linear-gradient(90deg,rgba(245,158,11,.2),rgba(245,158,11,.05));}
+/* 浅色下提示行加深：默认 txt-3 中灰在 11.5px 下发虚，换成深灰蓝保证可读 */
 #va-app[data-theme="light"] .va-btn.primary,
-#va-app[data-theme="light"] .va-drop,
-#va-app[data-theme="light"] .va-savebtn:not(:disabled){color:#fff;}
+#va-app[data-theme="light"] .va-drop{color:#fff;}
 
 #va-app{
-  position:relative; max-width:1440px; margin:0 auto;
+  position:relative; max-width:1600px; margin:0 auto;
   height:calc(100vh - 12px); min-height:520px; box-sizing:border-box;
   padding-bottom:var(--player-h,58px);   /* 给屏幕最底部的固定播放条留位，内容永不被挡 */
   display:flex; flex-direction:column;
@@ -150,7 +150,7 @@
   color:#fcd34d;font-size:12px;padding:8px 18px;border-bottom:1px solid rgba(251,191,36,.22);}
 
 /* ============================================================ 主体 */
-.va-main{flex:1;min-height:0;display:grid;grid-template-columns:296px minmax(380px,1fr) 322px;gap:14px;padding:14px 16px;}
+.va-main{flex:1;min-height:0;display:grid;grid-template-columns:300px minmax(380px,1fr) 300px;gap:14px;padding:14px 16px;}
 .va-col{display:flex;flex-direction:column;gap:10px;min-height:0;}
 
 /* 面板卡片 */
@@ -206,41 +206,50 @@
 .va-hint code{background:var(--surface-3);border-radius:4px;padding:1px 4px;font-size:10px;color:var(--txt-2);}
 
 /* ---------- 中：打分区 ---------- */
-.va-center{min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 4px 4px;}
+.va-center{min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 4px 4px;}
 /* 右栏兜底：内容再高也只在栏内出滚动条，不会滑到播放条底下 */
 .va-col-scroll{overflow-y:auto;overflow-x:hidden;}
 .va-col-scroll>.va-panel{flex-shrink:0;}
-.va-now{width:min(100%,600px);text-align:center;}
-.va-nowtitle{font-size:19px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.va-now{width:min(100%,var(--canvas-w,100%));text-align:center;}
+.va-nowtitle{font-size:17px;line-height:24px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .va-nowtitle.placeholder{font-size:15px;font-weight:500;color:var(--txt-3);}
-.va-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+/* 单行不换行 + 固定高度：标签多少都不会改变标题区高度 → 导入文件时画布不再缩小 */
+.va-chips{display:flex;gap:6px;flex-wrap:nowrap;justify-content:center;margin-top:6px;
+  overflow:hidden;max-width:100%;min-height:22px;align-items:center;}
+.va-chips .va-chip{flex:none;}
 .va-chip{font-size:10.5px;color:var(--txt-2);background:var(--surface-2);border:1px solid var(--line);
   border-radius:var(--r-pill);padding:2.5px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
 .va-chip b{color:var(--txt);font-weight:600;font-variant-numeric:tabular-nums;}
-.va-vaspace{position:relative;width:min(100%,462px);padding:1px;border-radius:20px;box-sizing:border-box;background:linear-gradient(150deg,rgba(139,92,246,.5),rgba(59,130,246,.18) 40%,rgba(var(--hi),.06));
+.va-vaspace{position:relative;width:min(100%,720px);padding:1px;border-radius:20px;box-sizing:border-box;background:linear-gradient(150deg,rgba(139,92,246,.5),rgba(59,130,246,.18) 40%,rgba(var(--hi),.06));
   box-shadow:0 22px 54px -26px rgba(0,0,0,.95);}
 /* 纯 CSS 正方：padding-top:100% 撑高度——不依赖 aspect-ratio（旧 iOS 不支持），JS 未执行时画布也在 */
 .va-vaspace::before{content:"";display:block;padding-top:100%;}
 .va-vaspace.fixed::before{display:none;}   /* JS 写入显式尺寸时，不再需要 CSS 撑高度 */
 #vaCanvas{position:absolute;top:1px;left:1px;width:calc(100% - 2px);height:calc(100% - 2px);border-radius:19px;cursor:crosshair;touch-action:none;background:var(--cv-bg);}
 
-.va-quadline{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--txt-3);text-align:center;min-height:20px;
-  flex-wrap:wrap;justify-content:center;}
-.va-quadline .qdot{width:8px;height:8px;border-radius:50%;background:var(--txt-4);transition:background .2s;}
-.va-quadline .xy{font-variant-numeric:tabular-nums;color:var(--txt-4);font-size:10.5px;}
-.va-savebtn{width:min(100%,462px);padding:13px 0;border-radius:var(--r-md);background:var(--grad);color:#fff;
+/* 状态读数统一放标题下的标签行（不再叠在画布上） */
+.va-chip.live{background:var(--ac-soft);border-color:var(--ac);color:var(--txt);font-weight:600;}
+.va-chip.edit{background:rgba(245,158,11,.16);border-color:#fcd34d;color:#92400e;font-weight:600;}
+.va-chip.warn{background:rgba(245,158,11,.16);border-color:#fcd34d;color:#92400e;}
+.va-chip.ok{background:rgba(16,185,129,.13);border-color:#6ee7b7;color:#047857;}
+.va-savebtn{width:min(100%,var(--canvas-w,100%));padding:11px 0;border-radius:var(--r-md);
+  background:#ffffff;color:#0f172a;border:1px solid #c7d2fe;
   font-size:15px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:9px;
-  box-shadow:0 16px 38px -14px rgba(124,92,255,.95),inset 0 1px 0 rgba(255,255,255,.3);
-  transition:filter .16s,transform .12s var(--ease);position:relative;overflow:hidden;}
-.va-savebtn:hover:not(:disabled){filter:brightness(1.12);}
+  box-shadow:0 10px 26px -16px rgba(15,23,42,.5);
+  transition:filter .16s,transform .12s var(--ease),background .16s,border-color .16s;position:relative;overflow:hidden;}
+.va-savebtn:hover:not(:disabled){filter:brightness(.97);border-color:#a5b4fc;}
 .va-savebtn:active:not(:disabled){transform:translateY(1px);}
-.va-savebtn:disabled{background:var(--surface-3);color:var(--txt-4);box-shadow:none;cursor:not-allowed;}
-.va-savebtn.edit{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 16px 38px -14px rgba(245,158,11,.9),inset 0 1px 0 rgba(255,255,255,.3);}
-.va-savebtn.flash::after{content:"";position:absolute;inset:0;background:rgba(61,220,151,.9);animation:vaFlash .5s var(--ease-out) forwards;}
-@keyframes vaFlash{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(1.04);}}
-.va-savebtn kbd{font-family:inherit;font-size:10px;font-weight:700;background:rgba(255,255,255,.2);border-radius:5px;padding:2px 6px;}
-.va-minorrow{display:flex;gap:8px;width:min(100%,462px);justify-content:center;}
-details.va-fix{width:min(100%,600px);font-size:11.5px;color:var(--txt-3);
+.va-savebtn:disabled{background:var(--surface-3);color:#334155;box-shadow:none;cursor:not-allowed;border-color:transparent;}
+/* 三态全是浅底 + 黑字：未完成=浅灰、可保存=白底靛蓝描边、编辑旧记录=淡黄 */
+.va-savebtn.pending{background:#eef2f7;color:#0f172a;border-color:transparent;box-shadow:none;}
+.va-savebtn.edit{background:#fffbeb;color:#0f172a;border-color:#fcd34d;box-shadow:0 10px 26px -16px rgba(180,83,9,.5);}
+.va-savebtn kbd{background:rgba(15,23,42,.08);color:#475569;}
+.va-savebtn.flash::after{content:"";position:absolute;inset:0;background:rgba(61,220,151,.9);animation:vaSaveFlash .5s var(--ease-out) forwards;}
+/* 独立动画名：原来和 .va-recpanel.flash 共用 vaFlash，被后定义的关键帧覆盖导致绿蒙版不淡出、白字被压住看不清 */
+@keyframes vaSaveFlash{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(1.04);}}
+.va-savebtn kbd{font-family:inherit;font-size:10px;font-weight:700;background:rgba(15,23,42,.08);color:#475569;border-radius:5px;padding:2px 6px;}
+.va-minorrow{display:flex;gap:8px;width:min(100%,var(--canvas-w,100%));justify-content:center;}
+details.va-fix{width:min(100%,var(--canvas-w,100%));font-size:11.5px;color:var(--txt-3);
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:0;}
 details.va-fix summary{cursor:pointer;user-select:none;padding:10px 13px;font-weight:550;list-style:none;}
 details.va-fix summary::-webkit-details-marker{display:none;}
@@ -271,6 +280,15 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 .va-stat.acc b{color:var(--ac);}
 .va-stat.good b{color:var(--good);}
 .va-note{font-size:10.5px;color:var(--txt-4);line-height:1.8;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+/* 数据安全面板 */
+.va-safety{margin-top:9px;padding:9px 11px;border-radius:var(--r-sm);background:var(--well);
+  border:1px solid var(--line-2);font-size:11px;color:var(--txt-2);line-height:1.85;display:flex;flex-direction:column;gap:6px;}
+.va-safety b{color:var(--txt);font-weight:650;font-variant-numeric:tabular-nums;}
+.va-safety.warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.45);}
+.va-safety.warn b{color:#b45309;}
+#va-app[data-theme="light"] .va-safety{background:var(--well);}
+#va-app[data-theme="light"] .va-safety.warn{background:#fffbeb;border-color:#fcd34d;color:#78350f;}
+#va-app[data-theme="light"] .va-safety.warn b{color:#b45309;}
 .va-grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 
 /* ============================================================ 播放条 */
@@ -350,11 +368,11 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
   background:var(--surface-3);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:2px 6px;color:var(--key-fg);}
 
 /* ============================================================ Toast */
-.va-toast{position:absolute;left:50%;bottom:88px;transform:translateX(-50%) translateY(10px);
+.va-toast{position:absolute;left:50%;bottom:82px;transform:translateX(-50%) translateY(10px);
   background:var(--toast-bg);backdrop-filter:blur(10px);border:1px solid var(--line-2);color:var(--txt);
-  padding:10px 18px;border-radius:var(--r-pill);font-size:12.5px;font-weight:500;opacity:0;pointer-events:none;
-  transition:opacity .22s var(--ease),transform .28s var(--ease-out);max-width:82%;text-align:center;z-index:99;
-  box-shadow:var(--sh-3);}
+  padding:5px 13px;border-radius:var(--r-pill);font-size:11.5px;font-weight:500;opacity:0;pointer-events:none;
+  transition:opacity .22s var(--ease),transform .28s var(--ease-out);max-width:min(62%,380px);text-align:center;z-index:99;
+  box-shadow:var(--sh-2);}
 .va-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .va-toast.ok{border-color:rgba(61,220,151,.45);box-shadow:var(--sh-3),0 0 22px -6px rgba(61,220,151,.5);}
 .va-toast.bad{border-color:rgba(251,108,125,.45);}
@@ -366,7 +384,7 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 #va-app ::-webkit-scrollbar-track{background:transparent;}
 
 @media (max-width:1080px){
-  .va-main{grid-template-columns:262px minmax(320px,1fr) 288px;gap:11px;padding:12px;}
+  .va-main{grid-template-columns:262px minmax(320px,1fr) 262px;gap:11px;padding:12px;}
 }
 @media (max-width:940px){
   #va-app{height:auto;min-height:calc(100vh - 12px);box-sizing:border-box;
@@ -483,8 +501,6 @@ select.va-mini{padding:5px 4px;}
 
       <div class="va-likert" id="vaLikert"></div>
 
-      <div class="va-quadline" id="vaQuad" aria-live="polite"><span class="qdot"></span><span id="vaQuadText">听完音乐 → 在图中点一下 → 保存</span></div>
-
       <button class="va-savebtn" id="vaSave" type="button" disabled>保存并下一条 <kbd>S</kbd></button>
       <div class="va-minorrow">
         <button class="va-btn tiny ghost" id="vaClearAnchor" type="button">清除打分</button>
@@ -530,6 +546,7 @@ select.va-mini{padding:5px 4px;}
         <div class="va-pad">
           <div class="va-statgrid" id="vaStats"></div>
           <p class="va-note">🛡 盲标：不显示他人分数。同一音频可由多人重复标注，每条记录独立保存、互不覆盖。<br>💾 每打一条分即刻保存到本机，软件卡了 / 闪退不丢数据；换电脑或清理浏览器数据前，请先在右上角「导出」备份 CSV。</p>
+          <div class="va-safety" id="vaSafety"></div>
         </div>
       </div>
 
@@ -548,8 +565,8 @@ select.va-mini{padding:5px 4px;}
               <label class="va-field"><span>最少听满才能保存</span>
                 <select id="vaStrict" class="va-mini">
                   <option value="0">不限制</option>
-                  <option value="0.3">30%</option>
-                  <option value="0.5">50%（推荐）</option>
+                  <option value="0.3">30%（推荐）</option>
+                  <option value="0.5">50%</option>
                   <option value="0.8">80%</option>
                   <option value="1">必须完整听完一遍</option>
                 </select></label>
@@ -626,7 +643,7 @@ select.va-mini{padding:5px 4px;}
   var persistent=true;
   function empty(){ return {records:[],overrides:{},plays:{},drafts:{},queue:[],heard:{},
     dims:JSON.parse(JSON.stringify(DEFDIMS)),
-    settings:{strict:0.5,remember:true,apiUrl:'',theme:'light'},
+    settings:{strict:0.3,remember:true,apiUrl:'',theme:'light'},
     profile:{name:'',age:'',gender:'',hometown:'',mbti:'',instrument:'',listen:''}}; }
   function loadStore(){
     var raw=null;
@@ -635,7 +652,7 @@ select.va-mini{padding:5px 4px;}
     if(!raw && window.zcode && window.zcode.widgetState && window.zcode.widgetState.privateContent) raw=window.zcode.widgetState.privateContent;
     var s=empty();
     if(raw){ try{ var p=JSON.parse(raw); s.records=p.records||[]; s.overrides=p.overrides||{}; s.plays=p.plays||{};
-      s.drafts=p.drafts||{}; s.queue=p.queue||[]; s.heard=p.heard||{};
+      s.drafts=p.drafts||{}; s.queue=p.queue||[]; s.heard=p.heard||{}; s.lastExportAt=p.lastExportAt||0;
       /* 初版不启用 Likert 打分：dims 恒为空。老记录里的 likert 分数仍保留，导出不丢 */
       s.settings=Object.assign(empty().settings,p.settings||{});
       s.profile=Object.assign(empty().profile,p.profile||{}); }catch(e){} }
@@ -908,6 +925,11 @@ select.va-mini{padding:5px 4px;}
   /* ---------- 选曲与播放 ---------- */
   function selectTrack(i,force){
     if(i<0||i>=tracks.length) return;
+    /* 未保存提醒：当前这首打了分还没存（草稿里有位置），切换前先问 */
+    if(!force && cur && cur.id!==tracks[i].id){
+      var d=store.drafts[cur.id];
+      if(d && d.x!=null && !confirm('⚠ 第 '+(curIndex+1)+' 首还没保存\n\n你打了分但没点保存，现在切换不会计入记录。分数只是暂存，随时可以点回来继续保存。\n\n「确定」= 仍然切换\n「取消」= 留下先保存')) return;
+    }
     /* 防重复打分：任何途径切到"自己已打过分"的曲子都先警告（曲库点击 / 上一首 / 快捷键 P 都走这里）。
        记录列表里显式点「修改这条」传 force=true 跳过（按钮本身已表明意图） */
     var r=myRec(tracks[i].id);
@@ -1184,33 +1206,15 @@ select.va-mini{padding:5px 4px;}
     setAnchor({x:clamp(anchor.x+dx),y:clamp(anchor.y+dy)});
   }
 
-  /* ---------- 读数 ---------- */
+  /* ---------- 读数（状态文字已移入标题标签行，这里只管按钮） ---------- */
   function updateReadouts(){
-    var q=$('vaQuadText'), dot=document.querySelector('#vaQuad .qdot');
-    if(!anchor){
-      if(editingId){
-        var r=recById(editingId);
-        q.textContent = r ? '编辑模式：正在修改这条记录（'+recTime(r.saved_at)+'）的分数' : '编辑模式';
-      } else q.textContent='听完音乐 → 在图中点一下（可拖动微调）→ 保存';
-      dot.style.background='var(--txt-4)';
-    }else{
-      var name=quadName(anchor);
-      q.textContent=name+' · V='+fmtV(anchor.x*2-1)+'  A='+fmtV((1-anchor.y)*2-1);
-      dot.style.background = name==='中性' ? 'var(--txt-2)' : (anchor.x>=0.5 ? (anchor.y<0.5?'var(--info)':'var(--good)') : 'var(--bad)');
-    }
-    var btn=$('vaSave'), miss=missing(), st=+store.settings.strict||0, hr=cur?(heard[cur.id]||0):0;
+    var btn=$('vaSave'), miss=missing();
     btn.disabled=!cur;
     btn.classList.toggle('edit',!!editingId);
+    btn.classList.toggle('pending',!!cur && miss.length>0);   /* 未完成 → 浅灰态；可保存 → 白底描边 */
     btn.innerHTML=(editingId?'更新这条标注':(miss.length?('还差：'+miss.join('、')):'保存并下一条'))+' <kbd>S</kbd>';
-    if(cur && st>0){
-      q.textContent += (hr>=st ? (' · 已听 '+Math.round(hr*100)+'% ✅')
-                               : (' · 已听 '+Math.round(hr*100)+'%，需听满 '+Math.round(st*100)+'%'));
-    }
     $('vaCancelEdit').hidden=!editingId;
     $('vaClearAnchor').disabled=!anchor;
-    /* 编辑状态提示并入这一行文案（原独立黄条已删，给画布腾空间） */
-    var r2=editingId&&recById(editingId);
-    if(r2) q.textContent+=' · 原值 V='+fmtV(r2.valence)+' A='+fmtV(r2.arousal)+'，保存即覆盖这条';
   }
   function recById(id){ for(var i=0;i<store.records.length;i++) if(store.records[i].record_id===id) return store.records[i]; return null; }
 
@@ -1219,17 +1223,12 @@ select.va-mini{padding:5px 4px;}
     var title=$('vaNowTitle');
     if(!cur){ title.textContent='导入音频后开始标注'; title.classList.add('placeholder'); $('vaNowChips').innerHTML=''; return; }
     title.classList.remove('placeholder');
-    var m=effMeta(cur), parts=[];
-    if(m.country) parts.push(['🌍',m.country]);
-    if(m.style) parts.push(['🎼',m.style]);
-    if(m.track) parts.push(['曲目','#'+m.track]);
-    if(m.segment) parts.push(['片段','#'+m.segment]);
-    if(m.lyric) parts.push(['歌词段','#'+m.lyric]);
-    if(m.source) parts.push(['来源',m.source]);
     title.textContent=cur.name.replace(/\.[a-z0-9]+$/i,'');
-    var html=parts.map(function(p){ return '<span class="va-chip">'+esc(p[0])+' '+esc(p[1])+'</span>'; }).join('');
+    /* 标题下只留三个标签：收听进度 / 播放次数 / 第几条——其余信息一律不显示 */
+    var st=+store.settings.strict||0, hr=heard[cur.id]||0;
+    var html='<span class="va-chip '+(st>0&&hr<st?'warn':'ok')+'">🎧 已听 '+Math.round(hr*100)+'%'
+      +(st>0?(hr>=st?' ✓':' · 需满 '+Math.round(st*100)+'%'):'')+'</span>';
     html+='<span class="va-chip">▶ 播放 <b>'+(cur.plays||0)+'</b> 次</span>';
-    var rt=ratersOf(cur.id); if(rt) html+='<span class="va-chip">👥 <b>'+rt+'</b> 人标过</span>';
     html+='<span class="va-chip">第 <b>'+(curIndex+1)+'/'+tracks.length+'</b></span>';
     $('vaNowChips').innerHTML=html;
   }
@@ -1289,7 +1288,24 @@ select.va-mini{padding:5px 4px;}
       '<div class="va-stat good"><span>已听过</span><b>'+heard+'</b></div>';
     $('vaFootStats').textContent='完成 '+done+'/'+tracks.length+' · 待标 '+todo+' 首';
     $('vaRecBtn').innerHTML='🗂 我的记录'+(mine?' '+mine:'');
+    renderSafety();
   }
+  /* ---------- 数据安全面板：本机存了多少、上次导出、有没有没保存的 ---------- */
+  function draftCount(){ var n=0; for(var k in store.drafts){ if(store.drafts[k]&&store.drafts[k].x!=null) n++; } return n; }
+  function lastRecordTime(){ var t=0; store.records.forEach(function(r){ var s=Date.parse(r.updated_at||r.saved_at||0)||0; if(s>t) t=s; }); return t; }
+  function hasUnsavedWork(){ return draftCount()>0 || (store.records.length>0 && lastRecordTime()>(store.lastExportAt||0)); }
+  function renderSafety(){
+    var box=$('vaSafety'); if(!box) return;
+    var n=store.records.length, ex=store.lastExportAt||0, dc=draftCount(), dirty=hasUnsavedWork();
+    var when=ex?recTime(new Date(ex).toISOString()):'从未导出';
+    box.className='va-safety'+(dirty?' warn':'');
+    box.innerHTML='<div>'+(dirty?'⚠':'🛡')+' 本机已存 <b>'+n+'</b> 条记录'+(dc?(' · <b>'+dc+'</b> 首打了分还没保存'):'')+'</div>'
+      +'<div>上次导出：<b>'+when+'</b>'+(n&&dirty?'（有数据还没导出）':'')+'</div>'
+      +'<button class="va-btn tiny block" id="vaExportNow" type="button">⬇ 立即导出 CSV</button>';
+  }
+  $('vaSafety').addEventListener('click',function(e){ if(e.target.closest('#vaExportNow')) expCsv(); });
+  /* 关页面 / 关标签前提醒：还有没保存的打分，或有新记录没导出 */
+  window.addEventListener('beforeunload',function(e){ if(hasUnsavedWork()){ e.preventDefault(); e.returnValue=''; } });
   function refresh(){ renderNow(); renderPlaylist(); updateStats(); updateReadouts(); renderLikert(); renderRecords(); fitCanvas(); drawVA(); }
 
   /* ---------- 保存 / 更新 ---------- */
@@ -1320,8 +1336,8 @@ select.va-mini{padding:5px 4px;}
       Object.assign(r,vals);
       r.updated_at=now;
       if(!r.first_saved_at) r.first_saved_at=r.saved_at;
-      /* 新旧分差异大时给个显式提醒，方便复核是不是误操作 */
-      toast(((dv>0.5||da>0.5)?'⚠ 这次和上次分数差别较大，已记下修改时间 · ':'')+'✓ 已更新记录 '+r.record_id,'ok');
+      /* 只在分数变化大时提醒（保存成功的弹窗已去掉：按钮绿闪 + 自动跳下一首即是反馈） */
+      if(dv>0.5||da>0.5) toast('⚠ 这次和上次分数差别较大，已记下修改时间');
     }else{
       var rec=Object.assign({
         record_id:'R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),
@@ -1334,7 +1350,6 @@ select.va-mini{padding:5px 4px;}
       pushRemote(rec).then(function(ok){
         if(!ok && (store.settings.apiUrl||'').trim()){ store.queue.push(rec); save(); renderSync(); }
       });
-      toast(store.profile.name?('✓ 已保存 V='+fmtV(rec.valence)+' A='+fmtV(rec.arousal)+(dims().length?(' · '+dims().length+' 项打分'):'')):('✓ 已保存（建议先在右侧填写姓名）'),'ok');
     }
     save();
     var btn=$('vaSave'); btn.classList.add('flash'); setTimeout(function(){ btn.classList.remove('flash'); },520);
@@ -1345,6 +1360,7 @@ select.va-mini{padding:5px 4px;}
   $('vaSave').addEventListener('click',saveAndNext);
   $('vaClearAnchor').addEventListener('click',function(){
     if(!cur) return;
+    if(!confirm('确定清除这个打分？\n\n只是清掉画布上的位置，需要重新点一次；\n已保存过的记录不受影响（若正在编辑，记录会还原成原来的分数）。')) return;
     delete anchors[cur.id]; anchor=null; editingId=null; saveDraft();
     updateReadouts(); drawVA(); toast('已清除这个打分');
   });
@@ -1397,6 +1413,7 @@ select.va-mini{padding:5px 4px;}
     var cols=allCols(), lines=[cols.join(',')];
     store.records.forEach(function(r){ lines.push(cols.map(function(c){ return cellOf(r,c); }).join(',')); });
     dl(new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv'}),'VA标注_'+stamp()+'.csv');
+    store.lastExportAt=Date.now(); save(); renderSafety();
     toast('CSV 已导出（'+store.records.length+' 条 × '+cols.length+' 列）','ok');
   }
   function expLong(){
@@ -1459,6 +1476,7 @@ select.va-mini{padding:5px 4px;}
     var pack={schema:'va-annotator-backup',version:1,exported_at:new Date().toISOString(),
       records:store.records,overrides:store.overrides,plays:store.plays,profile:store.profile};
     dl(new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),'VA完整备份_'+stamp()+'.json');
+    store.lastExportAt=Date.now(); save(); renderSafety();
     toast('完整备份已导出','ok');
   }
   /* 导出菜单精简为两项：CSV（同学交作业用）+ 备份 JSON（换设备用）。
@@ -1764,6 +1782,7 @@ select.va-mini{padding:5px 4px;}
     if(window.matchMedia && window.matchMedia('(max-width:940px)').matches){
       box.classList.remove('fixed');
       if(box.style.width){ box.style.width=''; box.style.height=''; }
+      root.style.setProperty('--canvas-w','100%');
       return;
     }
     var others=0, vis=0, i, ch;
@@ -1772,10 +1791,14 @@ select.va-mini{padding:5px 4px;}
       if(ch===box||ch.hidden) continue;
       others+=ch.offsetHeight; vis++;
     }
-    var avail=center.clientHeight-others-12*vis-6;   /* 12=flex gap，6=下padding+余量 */
-    var size=Math.floor(Math.min(462,Math.max(240,avail)));
-    if(box.style.width!==size+'px'){
-      box.style.width=size+'px'; box.style.height=size+'px'; box.classList.add('fixed');
+    var avail=center.clientHeight-others-10*vis-6;   /* 10=flex gap，6=下padding+余量 */
+    /* 高吃满剩余空间（上限780）；宽取 栏宽/1000/高的1.5倍 最小者——尽可能又宽又长，且不滚动 */
+    var h=Math.floor(Math.min(780,Math.max(240,avail)));
+    var w=Math.floor(Math.min((center.clientWidth||1000)-8,1000,h*1.5));
+    /* 标题 / 保存按钮 / 操作行 / 修正面板一律跟画布同宽——整列对齐，不留多余宽度 */
+    root.style.setProperty('--canvas-w',w+'px');
+    if(box.style.width!==w+'px'||box.style.height!==h+'px'){
+      box.style.width=w+'px'; box.style.height=h+'px'; box.classList.add('fixed');
     }
   }
   /* 播放条真实高度 → CSS 变量，卡片据此留位（条子换行变高也不会挡内容） */
