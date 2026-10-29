@@ -70,7 +70,11 @@
   -webkit-font-smoothing:antialiased;
 }
 #va-app button,#va-app input,#va-app select,#va-app label,#va-app a{font-family:inherit;}
-#va-app button{cursor:pointer;border:none;background:none;color:inherit;}
+#va-app button{cursor:pointer;}
+/* 按钮重置必须用 :where(#va-app) 把特异性降到最低：原来的 #va-app button 是 (1,0,1)，
+   会压过所有组件类的 background/border/color——主按钮、选中高亮全部渲染成透明，
+   界面上只剩"小白方框"。降到 (0,0,1) 后组件样式才能正常生效 */
+:where(#va-app) button{border:none;background:none;color:inherit;}
 #va-app :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:var(--r-xs);}
 
 /* 背景装饰层 */
@@ -86,6 +90,10 @@
   background-size:44px 44px;mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 78%);
   -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 78%);}
 #va-app>*:not(.va-bottom){position:relative;z-index:1;}
+/* 弹窗 / Toast 必须浮在视口上：上一条 #va-app>* 规则特异性更高，会把 .va-modal 的 absolute
+   压成 relative 参与文档流——弹窗一高就显示不全且滚不动。这里用同样高（且更靠后）的规则改回覆盖层 */
+#va-app>.va-modal{position:fixed;z-index:95;}
+#va-app>.va-toast{position:fixed;z-index:99;}
 #va-app>.va-top{z-index:20;}    /* 顶栏含导出菜单，必须压过内容区，否则菜单被挡 */
 #va-app>.va-warn{z-index:15;}
 
@@ -178,7 +186,7 @@
 .va-plhead b{color:var(--txt);font-variant-numeric:tabular-nums;}
 .va-chk{display:inline-flex;align-items:center;gap:5px;cursor:pointer;margin-left:auto;white-space:nowrap;color:var(--txt-2);}
 .va-chk input{accent-color:var(--ac);cursor:pointer;}
-.va-playlist{flex:0 1 auto;min-height:90px;max-height:34%;overflow:auto;background:var(--well);border:1px solid var(--line);
+.va-playlist{flex:1 1 auto;min-height:120px;overflow:auto;background:var(--well);border:1px solid var(--line);
   border-radius:var(--r-md);box-shadow:var(--well-inset);}
 .va-empty{padding:34px 20px;text-align:center;color:var(--txt-4);font-size:12px;line-height:2.1;}
 .va-empty b{display:block;font-size:22px;margin-bottom:6px;opacity:.5;}
@@ -289,7 +297,36 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 #va-app[data-theme="light"] .va-safety{background:var(--well);}
 #va-app[data-theme="light"] .va-safety.warn{background:#fffbeb;border-color:#fcd34d;color:#78350f;}
 #va-app[data-theme="light"] .va-safety.warn b{color:#b45309;}
+/* 音乐风格多选：三列宫格，选中带 ✓ */
+.va-stylepick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.va-style{padding:7px 4px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);
+  color:var(--txt-2);font-size:11.5px;cursor:pointer;transition:all .14s;font-family:inherit;text-align:center;}
+.va-style:hover{border-color:var(--ac);color:var(--txt);}
+.va-style.on{background:var(--ac-soft);border-color:var(--ac);color:var(--tag-fg);font-weight:600;}
+.va-style.on::before{content:"✓ ";}
 .va-grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+
+/* ---------- 心理压力面板 ---------- */
+.va-stress-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px;line-height:1.6;}
+.va-stress-tbl td{border:1px solid var(--line);padding:5px 8px;vertical-align:top;}
+.va-stress-tbl td:first-child{width:84px;color:var(--txt-3);background:var(--well);white-space:nowrap;}
+.va-stress-tbl b{color:var(--txt);font-weight:650;}
+.va-stress-lv{display:inline-flex;align-items:center;gap:5px;font-weight:700;}
+.va-stress-lv i{font-style:normal;width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+/* 自测弹窗底部操作条：吸底常驻 + 大号通栏按钮（高对比文字，不会只剩一个小色块） */
+.va-quizfoot{position:sticky;bottom:0;display:flex;flex-direction:column;gap:8px;
+  margin:12px -18px -18px;padding:10px 18px 12px;background:var(--modal-bg);border-top:1px solid var(--line);}
+.va-quizfoot .va-quizhint{font-size:11.5px;color:var(--txt-3);line-height:1.6;text-align:center;}
+.va-quizbig{width:100%;padding:12px 0;border-radius:var(--r-md);font-size:15px;font-weight:750;letter-spacing:.05em;
+  transition:filter .16s,transform .12s var(--ease);}
+.va-quizbig.go{background:var(--grad);color:#fff;box-shadow:0 10px 24px -12px rgba(139,92,246,.95);}
+.va-quizbig.go:hover{filter:brightness(1.1);}
+.va-quizbig:active{transform:translateY(1px);}
+.va-quizbig.wait{background:var(--surface-3);color:var(--txt-2);border:1px solid var(--line-2);cursor:not-allowed;}
+.va-quizbig.plain{background:var(--surface-3);color:var(--txt);border:1px solid var(--line-2);}
+.va-quizbig.plain:hover{background:var(--btn-hover);}
+.va-quizdone{margin:10px 0 0;padding:8px 12px;border-radius:var(--r-sm);background:var(--ac-soft);
+  border:1px solid var(--ac);font-size:12px;color:var(--txt);line-height:1.7;text-align:center;}
 
 /* ============================================================ 播放条 */
 /* 播放条：固定在屏幕最底部，通栏，不随内容滚动、不悬空 */
@@ -327,13 +364,16 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 #vaVol{width:74px;}
 
 /* ============================================================ 记录面板（左栏 · 曲库下方） */
-.va-recpanel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+.va-recpanel{flex:0 0 auto;display:flex;flex-direction:column;overflow:hidden;}
+/* 记录面板可折叠：折叠后左栏剩余高度全给曲库 */
+.va-recpanel h3{cursor:pointer;user-select:none;}
+.va-recpanel.folded .va-rec-tools,.va-recpanel.folded .va-reclist{display:none;}
 .va-recpanel.flash{animation:vaFlash 1.1s var(--ease);}
 @keyframes vaFlash{0%,100%{box-shadow:var(--sh-2),inset 0 1px 0 rgba(var(--hi),.05);}
   30%{box-shadow:0 0 0 2px var(--ac),var(--sh-2);}}
 .va-rec-tools{display:flex;gap:7px;align-items:center;padding:0 14px 10px;flex-wrap:wrap;}
 #vaRecSearch{flex:1;min-width:96px;}
-.va-reclist{flex:1;min-height:0;overflow:auto;padding:0 12px 12px;}
+.va-reclist{flex:none;max-height:150px;overflow:auto;padding:0 12px 12px;}
 .va-rec{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;margin-bottom:7px;
   transition:border-color .15s,background .15s;animation:vaRise .25s var(--ease-out) both;}
 @keyframes vaRise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -354,11 +394,11 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 
 /* ============================================================ 快捷键弹窗 */
 .va-modal{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:95;padding:24px;
-  background:var(--scrim);backdrop-filter:blur(3px);}
+  background:var(--scrim);backdrop-filter:blur(3px);overflow:auto;}
 .va-modal.on{display:flex;}
 .va-modal-card{width:min(520px,100%);background:linear-gradient(180deg,rgba(var(--hi),.05),rgba(var(--hi),.01)),var(--modal-bg);
   border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-3);
-  animation:vaPop .22s var(--ease-out);max-height:100%;overflow:auto;}
+  animation:vaPop .22s var(--ease-out);max-height:100%;overflow:auto;margin:auto;}
 .va-modal-card header{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);}
 .va-modal-card header h2{font-size:14px;font-weight:650;flex:1;}
 .va-klist{padding:14px 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
@@ -366,6 +406,15 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
 .va-krow .keys{display:flex;gap:3px;flex:none;}
 .va-key{min-width:24px;text-align:center;font-size:10.5px;font-weight:700;font-family:ui-monospace,Consolas,monospace;
   background:var(--surface-3);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:2px 6px;color:var(--key-fg);}
+
+/* 操作手册弹窗 */
+.va-help{padding:14px 18px 18px;font-size:12.5px;color:var(--txt-2);line-height:1.9;}
+.va-help h4{font-size:12.5px;color:var(--txt);margin:13px 0 3px;font-weight:650;display:flex;gap:7px;align-items:center;}
+.va-help h4:first-child{margin-top:0;}
+.va-help b{color:var(--txt);}
+.va-help code{background:var(--surface-3);border-radius:4px;padding:1px 5px;font-size:11px;color:var(--txt-2);}
+.va-num{width:19px;height:19px;border-radius:50%;background:var(--ac-soft);color:var(--tag-fg);font-size:10.5px;
+  font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none;}
 
 /* ============================================================ Toast */
 .va-toast{position:absolute;left:50%;bottom:82px;transform:translateX(-50%) translateY(10px);
@@ -390,7 +439,7 @@ details.va-fix[open] summary{border-bottom:1px solid var(--line);}
   #va-app{height:auto;min-height:calc(100vh - 12px);box-sizing:border-box;
     padding-bottom:calc(var(--player-h,58px) + 14px);}
   .va-main{grid-template-columns:1fr;}
-  .va-playlist{max-height:250px;}
+  .va-playlist{max-height:60vh;}
   .va-recpanel{flex:0 0 auto;}
   .va-reclist{max-height:340px;}
   .va-center{order:-1;}
@@ -442,13 +491,15 @@ select.va-mini{padding:5px 4px;}
     <div class="va-rail" title="标注完成度"><i id="vaRailFill"></i><b id="vaRailText">0%</b></div>
     <div class="va-topstats" id="vaTopStats"></div>
     <div class="va-topactions">
+      <button class="va-btn ghost" id="vaHelpBtn" type="button" title="怎么用？点开看操作手册">📖 手册</button>
       <button class="va-btn" id="vaRecBtn" type="button">🗂 我的记录</button>
       <button class="va-btn ghost" id="vaThemeBtn" type="button" title="切换深色 / 浅色">🌙 深色</button>
       <button class="va-btn ghost" id="vaKeysBtn" type="button" aria-label="快捷键说明">⌨</button>
       <button class="va-btn ghost" id="vaImpBtn" type="button" title="导入之前导出的标注 JSON，继续标注（不是添加音频）">⬆ 导入标注</button>
       <button class="va-btn ghost" id="vaExpBtn" type="button" aria-haspopup="true">⬇ 导出</button>
       <div class="va-menu" id="vaExpMenu">
-        <button id="vaExpCsv" type="button">📄 导出 CSV<small>一行一首歌，Excel / WPS 直接打开</small></button>
+        <button id="vaExpCsv" type="button">📄 导出 CSV（我的记录）<small>只导当前标注人的分，一首歌一行，Excel 直接打开</small></button>
+        <button id="vaExpCsvAll" type="button">📄 导出 CSV（全部记录）<small>含其他标注人 / 改名前的记录，每人每歌一行</small></button>
         <button id="vaExpBackup" type="button">💾 导出备份 JSON<small>换电脑 / 清浏览器数据前导出，之后可导入还原</small></button>
       </div>
       <input type="file" id="vaImpFile" accept=".json,application/json" hidden>
@@ -469,14 +520,13 @@ select.va-mini{padding:5px 4px;}
       </div>
       <div class="va-plhead">
         <span>曲库 <b id="vaPlCount">0</b></span>
-        <label class="va-chk"><input type="checkbox" id="vaRand" checked>随机发曲</label>
+        <label class="va-chk"><input type="checkbox" id="vaRand">随机发曲</label>
         <button class="va-btn tiny ghost" id="vaShuffle" type="button">🔀 重排</button>
       </div>
       <div class="va-playlist" id="vaPlaylist"></div>
-      <div class="va-hint">在资源管理器里选中需要的音频（可 Ctrl 多选 / Shift 连选）再拖进窗口，**只有选中的才会进曲库**。文件名按 <code>国家_风格_曲目_片段_歌词段_来源</code> 自动识别，识别不了就在中间「手动修正」里改。<br>每项右上角 <b>✕</b> 可把单曲移出曲库（不动电脑文件、不删已存分数）；点<b>已标</b>条目可修改那次的分数。</div>
 
       <div class="va-panel va-recpanel" id="vaRecPanel">
-        <h3>标注记录 <em id="vaRecSub">共 0 条</em></h3>
+        <h3 id="vaRecHead" title="点击折叠 / 展开：折叠后曲库列表更长">标注记录 <em id="vaRecSub">共 0 条</em><button class="va-btn tiny ghost" id="vaRecFold" type="button" style="margin-left:8px;flex:none">▾ 折叠</button></h3>
         <div class="va-rec-tools">
           <input id="vaRecSearch" placeholder="搜索文件名 / 国家 / 风格…">
           <div class="va-seg" style="width:126px;flex:none" id="vaRecFilter">
@@ -538,6 +588,23 @@ select.va-mini{padding:5px 4px;}
             <label class="va-field"><span>每天听歌</span><select id="vaPListen"><option value="">未填</option><option>几乎不听</option><option>0.5小时内</option><option>0.5-2小时</option><option>2小时以上</option></select></label>
           </div>
           <a id="vaMbtiLink" class="va-mbtilink" href="https://www.16personalities.com/ch/%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95" target="_blank" rel="noopener">✏ 没填？做 MBTI 测试 ↗</a>
+          <label class="va-field"><span>喜欢的音乐风格（可多选）</span></label>
+          <div class="va-stylepick" id="vaPStyles"></div>
+        </div>
+      </div>
+
+      <div class="va-panel">
+        <h3>心理压力 <em id="vaStressTag">未填写</em></h3>
+        <div class="va-pad">
+          <label class="va-field"><span>最近一个月整体压力（自己判断）</span>
+            <select id="vaStressSelf">
+              <option value="">未填</option><option>没有压力</option><option>压力较轻</option><option>压力中等</option><option>压力较重</option><option>压力很大</option><option>不知道</option>
+            </select></label>
+          <label class="va-field"><span>压力来源（可多选）</span></label>
+          <div class="va-stylepick" id="vaStressSrc"></div>
+          <label class="va-field" style="margin-top:9px"><span>简单描述（可选）</span><input id="vaStressNote" placeholder="如：期末备考、家里的事、项目赶工…"></label>
+          <a id="vaStressTestLink" class="va-mbtilink" href="#">📝 不确定？花 2 分钟做 10 题压力自测（PSS-10）</a>
+          <div id="vaStressSummary"></div>
         </div>
       </div>
 
@@ -565,9 +632,9 @@ select.va-mini{padding:5px 4px;}
               <label class="va-field"><span>最少听满才能保存</span>
                 <select id="vaStrict" class="va-mini">
                   <option value="0">不限制</option>
-                  <option value="0.3">30%（推荐）</option>
+                  <option value="0.3">30%</option>
                   <option value="0.5">50%</option>
-                  <option value="0.8">80%</option>
+                  <option value="0.8">80%（推荐）</option>
                   <option value="1">必须完整听完一遍</option>
                 </select></label>
               <label class="va-field"><span>后端接收地址（留空=仅本地）</span><input id="vaApiUrl" class="va-mini" placeholder="https://your-server/api/records"></label>
@@ -600,6 +667,39 @@ select.va-mini{padding:5px 4px;}
     </div>
     <div class="va-vol">🔊 <input type="range" id="vaVol" min="0" max="100" value="90" aria-label="音量"></div>
     <div class="va-foot" id="vaFootStats"></div>
+  </div>
+
+  <!-- 操作手册弹窗 -->
+  <div class="va-modal" id="vaHelp">
+    <div class="va-modal-card" style="width:min(660px,100%)">
+      <header><h2>📖 操作手册</h2><button class="va-btn tiny ghost" id="vaHelpClose" type="button">✕</button></header>
+      <div class="va-help">
+        <h4><span class="va-num">1</span>导入音频</h4>
+        点左上「＋ 添加音频文件」或直接把文件拖进窗口（可多选）。文件名按 <code>国家_风格_曲目_片段_歌词段_来源</code> 命名会自动识别（如 <code>cn_pop_01_02_01_ai</code>）；识别不对就用画布下方「⚙ 手动修正」改，会写进标注记录。曲库条目右上角 <code>✕</code> 可把单曲移出曲库（不动电脑文件、不删已存分数）。
+        <h4><span class="va-num">2</span>听歌与打分</h4>
+        每首至少听满 <b>80%</b> 才能保存，进度看标题下「🎧 已听 X%」。在中间画布上点一下情感位置：<b>横轴</b>左消极 → 右积极，<b>纵轴</b>上激动 → 下平静；可按住拖动，也可用方向键微调。点「保存并下一条」或按 <code>S</code>，保存后自动跳到曲库里<b>下一首未标的歌（从上到下顺序）</b>；想随机跳就勾选左上「随机发曲」。
+        <h4><span class="va-num">3</span>改分与防误触</h4>
+        已打分的歌再进入会先询问；在打分区再次点击会弹「是否更新评分」，点取消就保持原分。同一首歌永远只保留最新一条，不会出现重复记录。
+        <h4><span class="va-num">4</span>填标注人资料</h4>
+        右侧「标注人」面板：姓名、年龄、性别、家乡、MBTI、乐器学习、每天听歌时长、喜欢的音乐风格（可多选）。<b>姓名务必先填</b>——多人标注全靠它区分，不填都算「匿名」。改名前后名字对不上的旧记录，会算在旧名字下（「我的」看不到），在「标注记录」切到「全部」逐条删除即可。资料随每条打分一起导出。
+        <h4><span class="va-num">5</span>心理压力（可选）</h4>
+        右侧「心理压力」面板：自己清楚就直接选自评等级、勾选压力来源（学业 / 工作 / 家庭事务等，可多选）；不确定就点「10 题压力自测（PSS-10）」，约 2 分钟出分。做完自动生成一张综合评价表（自评 + 来源 + 得分 + 建议），结果随每条标注一起导出 CSV（stress_ 开头的列）。
+        <h4><span class="va-num">6</span>看记录与进度</h4>
+        左下「标注记录」可搜索、修改、删除，点它的标题可以折叠（折叠后曲库列表更长）；顶部进度条和「我的记录」按钮看完成度。列表默认只显示「我的」，点「全部」可看其他人或你改名前的记录。
+        <h4><span class="va-num">7</span>导出与备份</h4>
+        右上「⬇ 导出」：<b>CSV（我的记录）</b>只导当前姓名打的分，一首歌一行，Excel 直接打开；多人合作时每人导自己的再汇总，填错名字 / 改名前的旧记录不会被导进来。<b>CSV（全部记录）</b>含所有标注人，每人每歌一行。<b>备份 JSON</b> 用于换电脑。导出会弹「另存为」窗口，自己选文件夹。换设备后用「⬆ 导入标注」还原。
+        <h4><span class="va-num">8</span>数据安全</h4>
+        每打一条分立即存到本机浏览器，闪退不丢数据；清浏览器数据或换电脑前记得先导出。全部快捷键按 <code>?</code> 查看。
+      </div>
+    </div>
+  </div>
+
+  <!-- 压力自测弹窗 -->
+  <div class="va-modal" id="vaStressModal">
+    <div class="va-modal-card" style="width:min(640px,100%)">
+      <header><h2>📝 压力自测 · PSS-10（最近一个月）</h2><button class="va-btn tiny ghost" id="vaStressClose" type="button">✕</button></header>
+      <div class="va-help" id="vaStressQuiz"></div>
+    </div>
   </div>
 
   <!-- 快捷键弹窗 -->
@@ -643,8 +743,8 @@ select.va-mini{padding:5px 4px;}
   var persistent=true;
   function empty(){ return {records:[],overrides:{},plays:{},drafts:{},queue:[],heard:{},
     dims:JSON.parse(JSON.stringify(DEFDIMS)),
-    settings:{strict:0.3,remember:true,apiUrl:'',theme:'light'},
-    profile:{name:'',age:'',gender:'',hometown:'',mbti:'',instrument:'',listen:''}}; }
+    settings:{strict:0.8,remember:true,apiUrl:'',theme:'light',rand:false},
+    profile:{name:'',age:'',gender:'',hometown:'',mbti:'',instrument:'',listen:'',styles:[]}}; }
   function loadStore(){
     var raw=null;
     try{ raw=localStorage.getItem(KEY); }catch(e){ persistent=false; }
@@ -655,7 +755,12 @@ select.va-mini{padding:5px 4px;}
       s.drafts=p.drafts||{}; s.queue=p.queue||[]; s.heard=p.heard||{}; s.lastExportAt=p.lastExportAt||0;
       /* 初版不启用 Likert 打分：dims 恒为空。老记录里的 likert 分数仍保留，导出不丢 */
       s.settings=Object.assign(empty().settings,p.settings||{});
-      s.profile=Object.assign(empty().profile,p.profile||{}); }catch(e){} }
+      s.profile=Object.assign(empty().profile,p.profile||{});
+      /* 一次性迁移①：统一执行"最少听满 80% 才能保存"；要改档位去 流程控制 里选，改完不会被再次自动覆盖 */
+      if(!s.settings.strict80){ s.settings.strict=0.8; s.settings.strict80=1; }
+      /* 同一人同一首歌只保留最新一条：每次启动都去重（老版本重复打分、多标签页互相覆盖都可能产生重复） */
+      var dupBefore=s.records.length; s.records=dedupRecords(s.records); s.dedupRemoved=dupBefore-s.records.length; s.dedupDone=1;
+    }catch(e){} }
     return s;
   }
   var store=loadStore();
@@ -664,6 +769,7 @@ select.va-mini{padding:5px 4px;}
     if(window.zcode && window.zcode.setWidgetState){ try{ window.zcode.setWidgetState({privateContent:JSON.stringify(store)}).catch(function(){}); }catch(e){} }
   }
   if(!persistent) $('vaWarn').hidden=false;
+  if(store.dedupRemoved>0) toast('已自动整理 '+store.dedupRemoved+' 条重复打分：同一首歌只保留最新一条','ok');
 
   /* ---------- 状态 ---------- */
   var tracks=[], curIndex=-1, cur=null;
@@ -685,20 +791,41 @@ select.va-mini{padding:5px 4px;}
     clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2800); }
   function stamp(){ var d=new Date(),p=function(n){return String(n).padStart(2,'0');};
     return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes()); }
-  function fallbackDl(blob,name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},800); }
-  function dl(blob,name){
-    /* iPad / iPhone Safari：blob 直接下载不可靠，优先弹系统分享面板（存储到文件 / AirDrop / 微信） */
+  function fallbackDl(blob,name,onok){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},800);
+    if(onok) onok(); }
+  /* 桌面 Chrome / Edge / 内置浏览器：弹「另存为」窗口，自己挑文件夹和文件名，直接存到电脑本地 */
+  function saveAsDl(blob,name,onok){
+    if(!window.showSaveFilePicker) return false;
+    var ext=(name.match(/\.[a-z0-9]+$/i)||[])[0], opts={suggestedName:name};
+    if(ext==='.csv') opts.types=[{description:'CSV 文件',accept:{'text/csv':['.csv']}}];
+    else if(ext==='.json') opts.types=[{description:'JSON 文件',accept:{'application/json':['.json']}}];
+    var p;
+    try{ p=window.showSaveFilePicker(opts); }catch(e){ return false; }
+    p.then(function(h){
+      return h.createWritable().then(function(w){
+        return w.write(blob).then(function(){ return w.close(); });
+      });
+    }).then(function(){ if(onok) onok(); })
+    .catch(function(e){
+      if(e&&e.name==='AbortError'){ toast('已取消，文件没有保存'); return; }
+      fallbackDl(blob,name,onok);   /* 环境不让弹「另存为」时，退回普通下载 */
+    });
+    return true;
+  }
+  function dl(blob,name,onok){
+    /* 优先「另存为」自选文件夹 → 普通下载（进浏览器默认下载文件夹）→ iPad/iPhone 最后才用分享面板 */
+    if(saveAsDl(blob,name,onok)) return;
     try{
       var file=new File([blob],name,{type:blob.type||'application/octet-stream'});
       if(navigator.canShare && navigator.canShare({files:[file]})){
         navigator.share({files:[file],title:name}).then(function(){
-          toast('已导出，在分享面板里选「存储到文件」保存','ok');
-        }).catch(function(e){ if(e&&e.name==='AbortError') return; fallbackDl(blob,name); });
+          if(onok) onok(); toast('已导出，在分享面板里选「存储到文件」保存','ok');
+        }).catch(function(e){ if(e&&e.name==='AbortError') return; fallbackDl(blob,name,onok); });
         return;
       }
     }catch(e){}
-    fallbackDl(blob,name);
+    fallbackDl(blob,name,onok);
   }
   function recTime(iso){ var d=new Date(iso); return isNaN(d)?String(iso||''):(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 
@@ -731,11 +858,27 @@ select.va-mini{padding:5px 4px;}
   function audioIdOf(name,size,lm){ return 'A-'+fnv(name+'|'+(size||0)+'|'+(lm||0)); }
 
   /* ---------- 标注人信息 ---------- */
+  var STYLE_OPTS=['流行','摇滚','嘻哈/说唱','民谣','电子','爵士','古典','R&B','抒情','金属','其他'];
   var P={name:$('vaPName'),age:$('vaPAge'),gender:$('vaPGender'),home:$('vaPHome'),mbti:$('vaPMbti'),inst:$('vaPInst'),listen:$('vaPListen')};
   function myName(){ return store.profile.name||'匿名'; }
+  function myStyles(){ return store.profile.styles||[]; }
+  function renderStyles(){
+    var box=$('vaPStyles'), sel=myStyles();
+    box.innerHTML=STYLE_OPTS.map(function(s){
+      var on=sel.indexOf(s)>=0;
+      return '<button type="button" class="va-style'+(on?' on':'')+'" data-s="'+esc(s)+'">'+esc(s)+'</button>';
+    }).join('');
+  }
+  $('vaPStyles').addEventListener('click',function(e){
+    var b=e.target.closest('.va-style'); if(!b) return;
+    var s=b.dataset.s, sel=myStyles(), i=sel.indexOf(s);
+    if(i>=0) sel.splice(i,1); else sel.push(s);
+    store.profile.styles=sel; save(); renderStyles();
+  });
   function loadProfile(){ P.name.value=store.profile.name||''; P.age.value=store.profile.age||'';
     P.gender.value=store.profile.gender||''; P.home.value=store.profile.hometown||''; P.mbti.value=store.profile.mbti||'';
-    P.inst.value=store.profile.instrument||''; P.listen.value=store.profile.listen||''; }
+    P.inst.value=store.profile.instrument||''; P.listen.value=store.profile.listen||'';
+    renderStyles(); renderStressUI(); }
   function updateMbtiLink(){
     var a=$('vaMbtiLink'), v=(store.profile.mbti||'').toUpperCase();
     a.textContent = v ? '✔ MBTI：'+v : '✏ 没填？做 MBTI 测试 ↗';
@@ -745,7 +888,8 @@ select.va-mini{padding:5px 4px;}
     var handler=function(){
       store.profile={name:P.name.value.trim(),age:P.age.value.trim(),gender:P.gender.value,
         hometown:P.home.value.trim(),mbti:P.mbti.value.trim().toUpperCase(),
-        instrument:P.inst.value,listen:P.listen.value};
+        instrument:P.inst.value,listen:P.listen.value,styles:store.profile.styles||[],
+        stress:store.profile.stress};
       save(); updateMbtiLink(); refresh();
     };
     for(var k in P){ P[k].addEventListener('input',handler); }
@@ -753,6 +897,150 @@ select.va-mini{padding:5px 4px;}
   $('vaMbtiLink').addEventListener('click',function(e){
     if(window.zcode && window.zcode.openExternal){ e.preventDefault(); window.zcode.openExternal({href:this.href}); }
   });
+
+  /* ---------- 心理压力（自评 + PSS-10 自测，可选，结果随记录导出） ---------- */
+  var STRESS_SRCS=['学业','工作','家庭事务','人际/感情','经济','健康','其他'];
+  /* PSS-10 知觉压力量表（Cohen, 1983）：测"最近一个月"的感知压力，10 题 0-4 分 */
+  var PSS10=[
+    '因为发生了意料之外的事情而感到心烦意乱',
+    '感觉无法控制自己生活中的重要事情',
+    '感到紧张不安和有压力',
+    '对处理个人问题的能力感到有信心',
+    '感到事情顺心如意',
+    '发现无法应付所有自己必须去做的事情',
+    '能控制住生活中令人恼火的事情',
+    '感觉事情都在自己掌控之中',
+    '因为一些超出自己控制范围的事情而生气',
+    '感觉困难积累得太多，自己无法克服'
+  ];
+  var PSS_REV=[3,4,6,7];                          /* 第 4/5/7/8 题是正向题，反向计分 */
+  var PSS_OPTS=['从不','偶尔','有时','经常','非常频繁'];
+  function stressData(){
+    if(!store.profile.stress) store.profile.stress={level:'',sources:[],note:'',pss:null};
+    if(!store.profile.stress.sources) store.profile.stress.sources=[];
+    return store.profile.stress;
+  }
+  function pssLevelOf(s){ return s<=13?'较低':(s<=26?'中等':'较高'); }
+  function stressColor(lv){ return lv==='较低'?'var(--good)':(lv==='较高'?'var(--bad)':'var(--warn)'); }
+  function renderStressSrc(){
+    var sel=stressData().sources||[];
+    $('vaStressSrc').innerHTML=STRESS_SRCS.map(function(s){
+      var on=sel.indexOf(s)>=0;
+      return '<button type="button" class="va-style'+(on?' on':'')+'" data-s="'+esc(s)+'">'+esc(s)+'</button>';
+    }).join('');
+  }
+  $('vaStressSrc').addEventListener('click',function(e){
+    var b=e.target.closest('.va-style'); if(!b) return;
+    var s=b.dataset.s, sel=stressData().sources, i=sel.indexOf(s);
+    if(i>=0) sel.splice(i,1); else sel.push(s);
+    save(); renderStressSrc(); renderStressSummary();
+  });
+  $('vaStressSelf').addEventListener('change',function(){ stressData().level=this.value; save(); renderStressSummary(); });
+  $('vaStressNote').addEventListener('input',function(){ stressData().note=this.value.trim(); save(); });
+  $('vaStressTestLink').addEventListener('click',function(e){ e.preventDefault(); openStressQuiz(); });
+
+  /* --- 综合评价表：自评 + 来源 + PSS-10 → 一张表（tmpPss 传本次刚算出的结果，用于弹窗内预览） --- */
+  function stressSummaryHTML(tmpPss){
+    var sp=stressData(); if(tmpPss) sp=Object.assign({},sp,{pss:tmpPss});
+    var hasSelf=!!sp.level, hasPss=!!(sp.pss&&sp.pss.score!=null);
+    if(!hasSelf&&!hasPss&&!(sp.sources||[]).length&&!sp.note)
+      return '<p class="va-note" style="margin-top:8px;padding-top:8px">先在上面自评、勾选来源，或点下面做 10 题自测——这里会生成你的压力综合评价表。</p>';
+    var selfMap={'没有压力':0,'压力较轻':0,'压力中等':1,'压力较重':2,'压力很大':2};
+    var lvMap={'较低':0,'中等':1,'较高':2};
+    var selfL=hasSelf?selfMap[sp.level]:null;
+    var pssL=hasPss?lvMap[sp.pss.level]:null;
+    var hi=Math.max(selfL==null?-1:selfL, pssL==null?-1:pssL);
+    var overall, advice;
+    if(selfL!=null&&pssL!=null){
+      if(selfL===pssL) overall='自评与自测结果一致：'+['压力较轻','压力中等','压力较大'][selfL];
+      else if(pssL>selfL) overall='自测压力高于你的自评——可能对状态估计偏乐观，建议多留意休息与情绪';
+      else overall='自评压力高于自测结果——压力可能来自具体的事情，可对照上方来源逐项拆解';
+    }else if(hasSelf&&selfL==null){
+      overall=hasPss?('你自评「不知道」，以自测结果为准：压力'+sp.pss.level):'你不确定压力大小？点下方「10 题压力自测」，测一下更客观';
+    }else overall=hasPss?('自测：压力'+sp.pss.level):(hasSelf?('自评：'+sp.level):'已填部分信息，建议补全自评或自测');
+    advice=['当前状态比较从容，保持规律作息即可。','有一定压力感，属常见范围：规律运动、保证睡眠、找人聊聊都有帮助。','压力偏高：优先处理最主要的一项来源、把大任务拆小；持续困扰时可向家人朋友或学校心理中心求助。'][hi<0?1:hi];
+    var rows='<tr><td>自评压力</td><td>'+(hasSelf?('<b>'+esc(sp.level)+'</b>'):'未填')+'</td></tr>'
+      +'<tr><td>压力来源</td><td>'+(sp.sources&&sp.sources.length?esc(sp.sources.join('、')):'未填')+'</td></tr>'
+      +(sp.note?'<tr><td>简要描述</td><td>'+esc(sp.note)+'</td></tr>':'')
+      +'<tr><td>PSS-10 自测</td><td>'+(hasPss?('<b class="va-stress-lv"><i style="background:'+stressColor(sp.pss.level)+'"></i>'+sp.pss.score+' / 40 · 压力'+esc(sp.pss.level)+'</b>'):'未测（点下方链接）')+'</td></tr>'
+      +'<tr><td>综合评价</td><td><b>'+esc(overall)+'</b></td></tr>'
+      +'<tr><td>建议</td><td>'+esc(advice)+'</td></tr>';
+    return '<table class="va-stress-tbl">'+rows+'</table>'
+      +'<p class="va-note" style="margin-top:7px;padding-top:7px">量表结果仅作自我参考，不构成心理诊断；压力随时间变化，感觉不对时可重新填写或再测一次。</p>';
+  }
+  function renderStressSummary(){
+    var sp=stressData(), bits=[];
+    if(sp.level) bits.push('自评'+sp.level.replace('压力',''));
+    if(sp.pss&&sp.pss.score!=null) bits.push('自测'+sp.pss.score+'分');
+    $('vaStressTag').textContent=bits.length?bits.join(' · '):'未填写';
+    $('vaStressSummary').innerHTML=stressSummaryHTML(null);
+  }
+  function renderStressUI(){
+    $('vaStressSelf').value=stressData().level||'';
+    $('vaStressNote').value=stressData().note||'';
+    renderStressSrc(); renderStressSummary();
+  }
+
+  /* --- PSS-10 自测弹窗 --- */
+  var sq={ans:{}};
+  function openStressQuiz(){ sq={ans:{}}; renderQuiz(); $('vaStressModal').classList.add('on'); }
+  function closeStressQuiz(){ $('vaStressModal').classList.remove('on'); }
+  $('vaStressClose').addEventListener('click',closeStressQuiz);
+  $('vaStressModal').addEventListener('click',function(e){ if(e.target===this) closeStressQuiz(); });
+  function renderQuiz(){
+    var n=Object.keys(sq.ans).length;
+    var rows=PSS10.map(function(q,i){
+      var v=sq.ans[i], dots='';
+      for(var s=0;s<=4;s++) dots+='<button type="button" class="va-lk-dot'+(v===s?' on':'')+'" data-q="'+i+'" data-v="'+s+'">'+s+'</button>';
+      return '<div class="va-lk'+(v==null?' miss':'')+'"><div class="va-lk-h"><b>'+(i+1)+'. '+esc(q)+'</b>'
+        +'<span class="va-lk-val">'+(v==null?'未答':esc(PSS_OPTS[v])+' · '+v)+'</span></div>'
+        +'<div class="va-lk-row">'+dots+'</div>'
+        +'<div class="va-lk-ends"><span>'+esc(PSS_OPTS[0])+'</span><span>'+esc(PSS_OPTS[4])+'</span></div></div>';
+    }).join('');
+    $('vaStressQuiz').innerHTML='<p style="margin:0 0 10px">回想<b>最近一个月</b>的生活，凭第一感觉作答，约 2 分钟。共 10 题，<b>全部答完后，点底部的「提交」按钮</b>算出结果（不用管哪题是反向的，按真实感受选就行）。</p>'
+      +rows
+      +'<div class="va-quizfoot">'
+      +'<div class="va-quizhint">'+(n<10
+        ?'已答 <b>'+n+'</b> / 10，还差 '+(10-n)+' 题——答满后，点下面的「提交」按钮'
+        :'✅ 已答满 10 题！点下面的「提交」按钮算出压力分数')+'</div>'
+      +'<button class="va-quizbig '+(n<10?'wait':'go')+'" id="vaStressCalc" type="button"'+(n<10?' disabled':'')+'>'
+      +(n<10?'提 交（还差 '+(10-n)+' 题）':'提 交 · 算出压力分数')+'</button></div>';
+    $('vaStressCalc').addEventListener('click',calcQuiz);
+  }
+  $('vaStressQuiz').addEventListener('click',function(e){
+    var b=e.target.closest('.va-lk-dot'); if(!b) return;
+    sq.ans[+b.dataset.q]=+b.dataset.v; renderQuiz();
+  });
+  function calcQuiz(){
+    var score=0, ans=[];
+    for(var i=0;i<10;i++){
+      var v=sq.ans[i]; if(v==null) return;
+      if(PSS_REV.indexOf(i)>=0) v=4-v;
+      score+=v; ans.push(sq.ans[i]);
+    }
+    var lv=pssLevelOf(score);
+    var descs={'较低':'感知压力处于较低水平，整体状态比较从容。','中等':'存在中等程度的压力感——这是很常见的范围，值得留意但不必紧张。','较高':'感知压力较高，建议认真对待，主动做一些调节。'};
+    $('vaStressQuiz').innerHTML='<div style="text-align:center;margin:2px 0 10px">'
+      +'<div style="font-size:11px;color:var(--txt-3)">你的 PSS-10 得分</div>'
+      +'<div style="font-size:34px;font-weight:800;line-height:1.2;color:'+stressColor(lv)+'">'+score+'<span style="font-size:14px;color:var(--txt-3);font-weight:500"> / 40</span></div>'
+      +'<div class="va-stress-lv" style="justify-content:center"><i style="background:'+stressColor(lv)+'"></i>压力'+esc(lv)+'</div>'
+      +'<p style="font-size:12px;color:var(--txt-2);margin:8px 0 0">'+esc(descs[lv])+'</p></div>'
+      +'<div class="va-quizdone">✅ 测试完成！<b>点底部的「💾 保存到我的资料」</b>——保存后会显示在右侧「心理压力」面板，并随每条打分记录导出到 CSV。</div>'
+      +stressSummaryHTML({score:score,level:lv})
+      +'<details class="va-fix" style="width:100%;margin-top:10px"><summary>列出每题作答</summary><div style="padding:8px 2px 2px">'
+      +PSS10.map(function(q,i){ return '<div style="display:flex;gap:8px;font-size:11.5px;padding:2px 0"><span style="color:var(--txt-4);flex:none">'+(i+1)+'.</span><span style="flex:1">'+esc(q)+'</span><b style="flex:none;color:var(--txt)">'+esc(PSS_OPTS[sq.ans[i]])+'</b></div>'; }).join('')
+      +'</div></details>'
+      +'<div class="va-quizfoot">'
+      +'<div class="va-quizhint">⚠ 结果还没保存——关掉弹窗就会丢失，点下面的按钮保存</div>'
+      +'<button class="va-quizbig go" id="vaStressSave" type="button">💾 保存到我的资料（Save）</button>'
+      +'<button class="va-quizbig plain" id="vaStressRedo" type="button">↺ 重新测一遍</button></div>';
+    $('vaStressSave').addEventListener('click',function(){
+      stressData().pss={score:score,level:lv,answers:ans.slice(),doneAt:new Date().toISOString()};
+      save(); renderStressUI(); closeStressQuiz();
+      toast('已保存压力自测结果：'+score+' 分（压力'+lv+'）','ok');
+    });
+    $('vaStressRedo').addEventListener('click',function(){ sq={ans:{}}; renderQuiz(); });
+  }
 
   /* ---------- 打分维度（Likert） ---------- */
   function dims(){ return store.dims; }
@@ -786,6 +1074,7 @@ select.va-mini{padding:5px 4px;}
   });
   function setLk(i,v){
     var d=dims()[i]; if(!d||!cur) return;
+    if(lk[d.key]!==v && !confirmEditChange()) return;   /* 已打分的歌误触 Likert 同样先确认 */
     lk[d.key]=v; activeDim=i; saveDraft(); renderLikert(); updateReadouts();
   }
   function saveDraft(){
@@ -822,8 +1111,8 @@ select.va-mini{padding:5px 4px;}
       added++;
       if(store.settings.remember) idbPut({id:id,name:f.name,size:f.size,lm:f.lastModified,blob:f});
     });
-    shuffle(tracks); refresh();
-    if(added) toast('已导入 '+added+' 首，已随机排序','ok');
+    refresh();
+    if(added) toast('已导入 '+added+' 首（按导入顺序排列）','ok');
     if(curIndex<0 && tracks.length) selectTrack(0);
   }
   $('vaFile').addEventListener('change',function(e){ addFiles(e.target.files); e.target.value=''; });
@@ -839,7 +1128,10 @@ select.va-mini{padding:5px 4px;}
     Array.prototype.forEach.call(this.children,function(x){ x.classList.toggle('on',x===b); });
     renderPlaylist();
   });
-  $('vaRand').addEventListener('change',function(){ toast(this.checked?'已开启随机发曲':'已关闭随机发曲'); });
+  $('vaRand').addEventListener('change',function(){
+    store.settings.rand=this.checked; save();
+    toast(this.checked?'已开启随机发曲（随机跳下一首）':'已关闭随机发曲（按曲库从上到下）');
+  });
 
   /* 单曲移出曲库：不动电脑文件、不删已存分数记录（记录按 audio_id 留着，以后重新导入同一文件会重新关联） */
   function removeTrack(id){
@@ -914,10 +1206,10 @@ select.va-mini{padding:5px 4px;}
       });
     });
     chain.then(function(){
-      shuffle(tracks); refresh();
+      refresh();
       if(curIndex<0 && tracks.length) selectTrack(0);
       done();
-      toast(n?('已生成 '+n+' 首示例音频（明快 / 忧伤 / 紧张）','ok'):'示例音频已在曲库中');
+      toast(n?'已生成 '+n+' 首示例音频（明快 / 忧伤 / 紧张）':'示例音频已在曲库中','ok');
     }).catch(function(){ done(); toast('示例生成失败：本环境不支持 Web Audio 离线渲染','bad'); });
   }
   $('vaDemoBtn').addEventListener('click',addDemo);
@@ -932,9 +1224,12 @@ select.va-mini{padding:5px 4px;}
     }
     /* 防重复打分：任何途径切到"自己已打过分"的曲子都先警告（曲库点击 / 上一首 / 快捷键 P 都走这里）。
        记录列表里显式点「修改这条」传 force=true 跳过（按钮本身已表明意图） */
-    var r=myRec(tracks[i].id);
-    if(r && i!==curIndex && !force && !confirm('⚠ 这首歌你已经打过分了\n\n当前分数：V='+fmtV(r.valence)+'   A='+fmtV(r.arousal)
-      +'\n保存时间：'+recTime(r.saved_at)+'\n\n「确定」= 进入修改，保存后会覆盖原分数\n「取消」= 什么都不改变')) return;
+    var r=myRec(tracks[i].id), viaIntent=false;
+    if(r && i!==curIndex){
+      if(!force && !confirm('⚠ 这首歌你已经打过分了\n\n当前分数：V='+fmtV(r.valence)+'   A='+fmtV(r.arousal)
+        +'\n保存时间：'+recTime(r.saved_at)+'\n\n「确定」= 进入修改，保存后会覆盖原分数\n「取消」= 什么都不改变')) return;
+      viaIntent=true;   /* 刚确认过要改 / 点了「修改这条」：第一次点画布不再重复弹确认 */
+    }
     curIndex=i; cur=tracks[i];
     audio.src=cur.url;
     audio.play().catch(function(){});
@@ -942,11 +1237,11 @@ select.va-mini{padding:5px 4px;}
 
     var rec=myRec(cur.id), d=store.drafts[cur.id]||null;
     if(rec){
-      editingId=rec.record_id;
+      editingId=rec.record_id; editWarned=viaIntent;   /* 刚明确要改（viaIntent）就不重复问；其他进入方式仍启用"改动前确认" */
       anchor={x:rec.x,y:rec.y}; anchors[cur.id]=anchor;
       lk=rec.likert?JSON.parse(JSON.stringify(rec.likert)):{};
     }else{
-      editingId=null;
+      editingId=null; editWarned=false;
       anchor=(d&&d.x!=null)?{x:d.x,y:d.y}:(anchors[cur.id]||null);
       lk=(d&&d.lk)?JSON.parse(JSON.stringify(d.lk)):{};
     }
@@ -954,7 +1249,7 @@ select.va-mini{padding:5px 4px;}
     refresh();
   }
   function nextTrack(){
-    if(!tracks.length) return;
+    if(!tracks.length) return false;
     var rand=$('vaRand').checked, idx=-1;
     if(rand){
       var cands=[];
@@ -966,8 +1261,8 @@ select.va-mini{padding:5px 4px;}
         if(i2!==curIndex && !annotatedByMe(tracks[i2])){ idx=i2; break; }
       }
     }
-    if(idx<0){ toast('🎉 当前曲库你已全部标注完成','ok'); return; }
-    selectTrack(idx);
+    if(idx<0){ toast('🎉 当前曲库你已全部标注完成','ok'); return false; }
+    selectTrack(idx); return true;
   }
   function prevTrack(){ if(!tracks.length) return; selectTrack((curIndex-1+tracks.length)%tracks.length); }
   function togglePlay(){
@@ -1190,8 +1485,20 @@ select.va-mini{padding:5px 4px;}
     anchor=p; if(cur){ anchors[cur.id]=anchor; saveDraft(); }
     updateReadouts(); drawVA();
   }
+/* 已打分的歌再碰打分区（点画布 / 拖动 / 键盘微调 / Likert）：第一次先弹"是否更新评分"（防误触覆盖），确认后本次内不再打扰。
+   editingId 为空时也查一次记录——刚保存完还停在原曲（如曲库已全部标完没跳走）时，误触同样要拦 */
+  var editWarned=false;
+  function confirmEditChange(){
+    if(!cur||editWarned) return true;
+    var r=editingId?recById(editingId):myRec(cur.id);
+    if(!r) return true;
+    if(!confirm('⚠ 这首歌已有评分（V='+fmtV(r.valence)+' A='+fmtV(r.arousal)+'）\n\n'
+      +'继续操作会修改这条评分，保存后覆盖原评分。\n\n「确定」= 我是有意修改\n「取消」= 保持原评分不变')) return false;
+    editingId=r.record_id; editWarned=true; return true;
+  }
   cv.addEventListener('pointerdown',function(e){
     if(!tracks.length) return;
+    if(!confirmEditChange()) return;
     e.preventDefault(); setAnchor(evPos(e)); dragging=true;
     try{ cv.setPointerCapture(e.pointerId); }catch(_){}
   });
@@ -1202,6 +1509,7 @@ select.va-mini{padding:5px 4px;}
   cv.addEventListener('pointerup',function(){ dragging=false; });
   cv.addEventListener('pointerleave',function(){ hoverPos=null; drawVA(); });
   function nudge(dx,dy){
+    if(!confirmEditChange()) return;
     if(!anchor) anchor={x:0.5,y:0.5};
     setAnchor({x:clamp(anchor.x+dx),y:clamp(anchor.y+dy)});
   }
@@ -1225,8 +1533,9 @@ select.va-mini{padding:5px 4px;}
     title.classList.remove('placeholder');
     title.textContent=cur.name.replace(/\.[a-z0-9]+$/i,'');
     /* 标题下只留三个标签：收听进度 / 播放次数 / 第几条——其余信息一律不显示 */
-    var st=+store.settings.strict||0, hr=heard[cur.id]||0;
-    var html='<span class="va-chip '+(st>0&&hr<st?'warn':'ok')+'">🎧 已听 '+Math.round(hr*100)+'%'
+    var st=+store.settings.strict||0, hr=heard[cur.id]||0, mr=myRec(cur.id);
+    var html=(mr?'<span class="va-chip ok">✓ 已评分 V'+fmtV(mr.valence)+' A'+fmtV(mr.arousal)+'</span>':'')
+      +'<span class="va-chip '+(st>0&&hr<st?'warn':'ok')+'">🎧 已听 '+Math.round(hr*100)+'%'
       +(st>0?(hr>=st?' ✓':' · 需满 '+Math.round(st*100)+'%'):'')+'</span>';
     html+='<span class="va-chip">▶ 播放 <b>'+(cur.plays||0)+'</b> 次</span>';
     html+='<span class="va-chip">第 <b>'+(curIndex+1)+'/'+tracks.length+'</b></span>';
@@ -1303,7 +1612,7 @@ select.va-mini{padding:5px 4px;}
       +'<div>上次导出：<b>'+when+'</b>'+(n&&dirty?'（有数据还没导出）':'')+'</div>'
       +'<button class="va-btn tiny block" id="vaExportNow" type="button">⬇ 立即导出 CSV</button>';
   }
-  $('vaSafety').addEventListener('click',function(e){ if(e.target.closest('#vaExportNow')) expCsv(); });
+  $('vaSafety').addEventListener('click',function(e){ if(e.target.closest('#vaExportNow')) expCsv(false); });
   /* 关页面 / 关标签前提醒：还有没保存的打分，或有新记录没导出 */
   window.addEventListener('beforeunload',function(e){ if(hasUnsavedWork()){ e.preventDefault(); e.returnValue=''; } });
   function refresh(){ renderNow(); renderPlaylist(); updateStats(); updateReadouts(); renderLikert(); renderRecords(); fitCanvas(); drawVA(); }
@@ -1321,6 +1630,9 @@ select.va-mini{padding:5px 4px;}
     var st=+store.settings.strict||0, hr=heard[cur.id]||0;
     if(st>0 && hr<st){ toast('请先听完 '+Math.round(st*100)+'% 再打分（当前 '+Math.round(hr*100)+'%）','bad'); return; }
 
+    /* 防重复：这首歌我已打过分的，一律转成"更新原记录"，任何路径都不会新增第二条 */
+    if(!editingId){ var ex=myRec(cur.id); if(ex) editingId=ex.record_id; }
+    var sp=store.profile.stress||{};
     var m=effMeta(cur), now=new Date().toISOString();
     var vals={
       audio_id:cur.id, file_name:cur.name,
@@ -1328,22 +1640,26 @@ select.va-mini{padding:5px 4px;}
       valence:+(anchor.x*2-1).toFixed(4), arousal:+((1-anchor.y)*2-1).toFixed(4),
       x:+anchor.x.toFixed(4), y:+anchor.y.toFixed(4),
       likert:JSON.parse(JSON.stringify(lk)), heard_ratio:+hr.toFixed(3),
-      play_count:cur.plays||0, elapsed_ms:Math.round(performance.now()-trackStartAt), saved_at:now
+      play_count:cur.plays||0, elapsed_ms:Math.round(performance.now()-trackStartAt),
+      stress_level:sp.level||'', stress_sources:(sp.sources||[]).join('/'), stress_note:sp.note||'',
+      stress_pss_score:(sp.pss&&sp.pss.score!=null)?sp.pss.score:'', stress_pss_level:(sp.pss&&sp.pss.score!=null)?sp.pss.level:'',
+      saved_at:now
     };
+    var wasUpdate=false, bigDiff=false;
     if(editingId && recById(editingId)){
       var r=recById(editingId);
       var dv=Math.abs(r.valence-vals.valence), da=Math.abs(r.arousal-vals.arousal);
       Object.assign(r,vals);
       r.updated_at=now;
       if(!r.first_saved_at) r.first_saved_at=r.saved_at;
-      /* 只在分数变化大时提醒（保存成功的弹窗已去掉：按钮绿闪 + 自动跳下一首即是反馈） */
-      if(dv>0.5||da>0.5) toast('⚠ 这次和上次分数差别较大，已记下修改时间');
+      wasUpdate=true; bigDiff=(dv>0.5||da>0.5);
     }else{
       var rec=Object.assign({
         record_id:'R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),
         annotator_name:myName(), annotator_age:store.profile.age||'', annotator_gender:store.profile.gender||'',
         annotator_hometown:store.profile.hometown||'', annotator_mbti:store.profile.mbti||'',
         annotator_instrument:store.profile.instrument||'', annotator_listen:store.profile.listen||'',
+        annotator_styles:myStyles().join('/'),
         user_agent:navigator.userAgent
       },vals);
       store.records.push(rec);
@@ -1355,7 +1671,19 @@ select.va-mini{padding:5px 4px;}
     var btn=$('vaSave'); btn.classList.add('flash'); setTimeout(function(){ btn.classList.remove('flash'); },520);
     delete anchors[cur.id]; delete store.drafts[cur.id];
     anchor=null; lk={}; activeDim=0; editingId=null;
-    nextTrack();
+    if(nextTrack()){
+      /* 更新旧评分给出明确文字反馈；新打分仍是绿闪+自动跳下一首 */
+      if(wasUpdate) toast(bigDiff?'✅ 这条数据已更新（⚠ 与上次差别较大，已记下修改时间）':'✅ 这条数据已更新','ok');
+      return;
+    }
+    /* 曲库已全部标完、没有下一首可跳：留在本曲，把刚保存的分数重新显示在画布上，
+       免得画布被清空后看起来像"没保存、没反应"；按钮回到"更新这条标注"，曲目标 ✓ */
+    var saved=myRec(cur.id);
+    if(saved){ editingId=saved.record_id; anchor={x:saved.x,y:saved.y}; anchors[cur.id]=anchor;
+      lk=saved.likert?JSON.parse(JSON.stringify(saved.likert)):{}; }
+    editWarned=false;
+    refresh();
+    toast((wasUpdate?'✅ 这条数据已更新！':'✅ 已保存！')+'曲库 '+tracks.length+' 首已全部标注完成，当前这首是最后一条','ok');
   }
   $('vaSave').addEventListener('click',saveAndNext);
   $('vaClearAnchor').addEventListener('click',function(){
@@ -1393,8 +1721,21 @@ select.va-mini{padding:5px 4px;}
   /* ---------- 导出 / 导入 ---------- */
   var BASE_COLS=['record_id','audio_id','file_name','country','style','track_no','segment_no','lyric_no','source',
     'annotator_name','annotator_age','annotator_gender','annotator_hometown','annotator_mbti',
-    'annotator_instrument','annotator_listen',
+    'annotator_instrument','annotator_listen','annotator_styles',
+    'stress_level','stress_sources','stress_note','stress_pss_score','stress_pss_level',
     'valence','arousal','x','y','heard_ratio','play_count','elapsed_ms','saved_at','updated_at','synced','user_agent'];
+  /* 同一标注人对同一首歌只保留最新一条：按 (姓名, 音频) 取 updated_at/saved_at 最新。
+     传 list 时对传入数组去重（启动迁移用）；不传时对当前全部记录去重（导出用） */
+  function dedupRecords(list){
+    var src=list||store.records, best={};
+    src.forEach(function(r){
+      var key=(r.annotator_name||'')+'|'+(r.audio_id||'');
+      var t=Date.parse(r.updated_at||r.saved_at||0)||0;
+      var old=best[key], ot=old?(Date.parse(old.updated_at||old.saved_at||0)||0):-1;
+      if(!old||t>=ot) best[key]=r;
+    });
+    return Object.keys(best).map(function(k){ return best[k]; });
+  }
   function likertKeys(){
     var seen={}, out=[];
     dims().forEach(function(d){ if(!seen[d.key]){ seen[d.key]=1; out.push(d.key); } });
@@ -1408,18 +1749,27 @@ select.va-mini{padding:5px 4px;}
   }
   function csvCell(v){ v=(v==null)?'':String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
   function needData(){ if(!store.records.length){ toast('暂无标注数据'); return false; } return true; }
-  function expCsv(){
+  /* 导出 CSV：默认只导当前标注人的记录（一首歌一行，改名前/其他人的不混入）；
+     all=true 导出全部人的（每人每歌一行，供多人结果汇总） */
+  function safeName(s){ return String(s||'匿名').replace(/[\\\/:*?"<>|]/g,'_'); }
+  function expCsv(all){
     if(!needData()) return;
-    var cols=allCols(), lines=[cols.join(',')];
-    store.records.forEach(function(r){ lines.push(cols.map(function(c){ return cellOf(r,c); }).join(',')); });
-    dl(new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv'}),'VA标注_'+stamp()+'.csv');
-    store.lastExportAt=Date.now(); save(); renderSafety();
-    toast('CSV 已导出（'+store.records.length+' 条 × '+cols.length+' 列）','ok');
+    var me=myName();
+    var src=all?store.records.slice():store.records.filter(function(r){ return (r.annotator_name||'匿名')===me; });
+    if(!src.length){ toast('没有「'+me+'」的记录可导出（旧记录请到「全部」里看）','bad'); return; }
+    var rows=dedupRecords(src);
+    var cols=allCols(), lines=[cols.join(',')], dropped=src.length-rows.length;
+    rows.forEach(function(r){ lines.push(cols.map(function(c){ return cellOf(r,c); }).join(',')); });
+    dl(new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv'}),
+      'VA标注_'+(all?'全部_':'')+safeName(me)+'_'+stamp()+'.csv',function(){
+      store.lastExportAt=Date.now(); save(); renderSafety();
+      toast('CSV 已保存：'+(all?'全部 ':'「'+me+'」的 ')+rows.length+' 条（一首歌一行）'+(dropped>0?('，已去掉 '+dropped+' 条旧评分'):''),'ok');
+    });
   }
   function expLong(){
     if(!needData()) return;
     var L=['record_id','audio_id','file_name','annotator_name','country','style','source','item','value','saved_at'], out=[L.join(',')];
-    store.records.forEach(function(r){
+    dedupRecords().forEach(function(r){
       ['valence','arousal'].forEach(function(k){
         out.push([r.record_id,r.audio_id,r.file_name,r.annotator_name,r.country,r.style,r.source,k,r[k],r.saved_at].map(csvCell).join(','));
       });
@@ -1449,6 +1799,12 @@ select.va-mini{padding:5px 4px;}
      ['annotator_mbti','MBTI','','分类'],
      ['annotator_instrument','乐器学习年限','音乐训练背景','分类'],
      ['annotator_listen','每天听歌时长','音乐暴露量','分类'],
+     ['annotator_styles','喜欢的音乐风格','多选，斜杠分隔','分类（可多值）'],
+     ['stress_level','压力自评','最近一个月整体压力（标注人面板自填）','没有压力/压力较轻/压力中等/压力较重/压力很大/不知道'],
+     ['stress_sources','压力来源','多选，斜杠分隔','学业/工作/家庭事务/人际感情/经济/健康/其他'],
+     ['stress_note','压力描述','自填的简短描述','文本'],
+     ['stress_pss_score','PSS-10 得分','知觉压力量表10题总分（最近一个月）','0 ~ 40'],
+     ['stress_pss_level','PSS-10 等级','量表自动判定','较低(0-13)/中等(14-26)/较高(27-40)'],
      ['valence','效价 Valence','消极 → 积极','−1 ~ +1'],
      ['arousal','唤醒度 Arousal','平静 → 激动','−1 ~ +1'],
      ['x','画布横坐标','点击位置','0 ~ 1'],
@@ -1474,14 +1830,16 @@ select.va-mini{padding:5px 4px;}
   }
   function expBackup(){
     var pack={schema:'va-annotator-backup',version:1,exported_at:new Date().toISOString(),
-      records:store.records,overrides:store.overrides,plays:store.plays,profile:store.profile};
-    dl(new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),'VA完整备份_'+stamp()+'.json');
-    store.lastExportAt=Date.now(); save(); renderSafety();
-    toast('完整备份已导出','ok');
+      records:store.records,overrides:store.overrides,plays:store.plays,heard:store.heard,settings:store.settings,profile:store.profile};
+    dl(new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),'VA完整备份_'+stamp()+'.json',function(){
+      store.lastExportAt=Date.now(); save(); renderSafety();
+      toast('完整备份已保存','ok');
+    });
   }
   /* 导出菜单精简为两项：CSV（同学交作业用）+ 备份 JSON（换设备用）。
      长表 / 变量说明 / 纯记录 JSON 的函数仍保留在下方，老师若需要可把按钮加回菜单 */
-  $('vaExpCsv').addEventListener('click',function(){ expCsv(); closeMenu(); });
+  $('vaExpCsv').addEventListener('click',function(){ expCsv(false); closeMenu(); });
+  $('vaExpCsvAll').addEventListener('click',function(){ expCsv(true); closeMenu(); });
   $('vaExpBackup').addEventListener('click',function(){ expBackup(); closeMenu(); });
   $('vaExpBackup2').addEventListener('click',expBackup);
   $('vaExpBtn').addEventListener('click',function(e){ e.stopPropagation(); $('vaExpMenu').classList.toggle('open'); });
@@ -1633,6 +1991,7 @@ select.va-mini{padding:5px 4px;}
     $('vaStrict').value=String(store.settings.strict);
     $('vaApiUrl').value=store.settings.apiUrl||'';
     $('vaRemember').checked=!!store.settings.remember;
+    $('vaRand').checked=!!store.settings.rand;
     applyTheme(store.settings.theme||'light');
     renderSync();
   }
@@ -1664,8 +2023,19 @@ select.va-mini{padding:5px 4px;}
 
   /* ---------- 记录面板（左栏 · 曲库下方，常驻可见） ---------- */
   var recFilter='mine', recQuery='';
+  /* 记录面板可折叠：折叠后左栏空间全给曲库 */
+  var recPanel=$('vaRecPanel');
+  function applyRecFold(){
+    var f=!!store.settings.recFolded;
+    recPanel.classList.toggle('folded',f);
+    $('vaRecFold').textContent=f?'▸ 展开':'▾ 折叠';
+  }
+  $('vaRecFold').addEventListener('click',function(e){ e.stopPropagation();
+    store.settings.recFolded=!store.settings.recFolded; save(); applyRecFold(); });
+  $('vaRecHead').addEventListener('click',function(){ $('vaRecFold').click(); });
   function focusRecords(){
     var p=$('vaRecPanel'); if(!p) return;
+    if(store.settings.recFolded){ store.settings.recFolded=false; save(); applyRecFold(); }
     renderRecords();
     p.scrollIntoView({behavior:'smooth',block:'nearest'});
     p.classList.remove('flash'); void p.offsetWidth; p.classList.add('flash');
@@ -1690,11 +2060,14 @@ select.va-mini{padding:5px 4px;}
     });
     $('vaRecSub').textContent=list.length+' / '+store.records.length+' 条'+(recFilter==='mine'?' · 我的':' · 全部');
     var el=$('vaRecList');
+    /* "我的"筛选会藏起改名前（匿名）或其他标注人的记录——数量对不上时给出提示，免得以为丢数据 */
+    var others=0; all.forEach(function(r){ if(r.annotator_name!==myName()) others++; });
+    var hint=(recFilter==='mine'&&others>0)?'<div class="va-hint" style="padding:0 2px 8px">另有 '+others+' 条其他标注人（或你改名前）的记录被「我的」筛掉了，点右上「全部」可见</div>':'';
     if(!list.length){
       el.innerHTML='<div class="va-empty">'+(store.records.length?'没有匹配的记录':'还没有任何标注记录<br>先导入音频打一条分试试')+'</div>';
       return;
     }
-    el.innerHTML=list.map(function(r){
+    el.innerHTML=hint+list.map(function(r){
       var meta=[r.country,r.style,r.track_no?('曲'+r.track_no):'',r.source].filter(Boolean).join(' · ');
       var mine=r.annotator_name===myName();
       return '<div class="va-rec" data-id="'+esc(r.record_id)+'">'
@@ -1709,8 +2082,9 @@ select.va-mini{padding:5px 4px;}
             return '<div class="va-rec-val"><span>'+esc(d.label)+'</span><b>'+(v==null?'—':v)+'</b></div>'; }).join('')
         +'<div class="va-rec-val"><span>MBTI</span><b style="font-size:12px">'+esc(r.annotator_mbti||'—')+'</b></div>'
         +'</div>'
-        +(mine?'<div class="va-rec-act"><button class="va-btn tiny" data-act="edit" type="button">✎ 修改这条</button>'
-          +'<button class="va-btn tiny ghost bad" data-act="del" type="button">🗑 删除</button></div>':'')
+        +'<div class="va-rec-act">'
+          +(mine?'<button class="va-btn tiny" data-act="edit" type="button">✎ 修改这条</button>':'')
+          +'<button class="va-btn tiny ghost bad" data-act="del" type="button">🗑 删除</button></div>'
         +'</div>';
     }).join('');
   }
@@ -1718,7 +2092,7 @@ select.va-mini{padding:5px 4px;}
     var b=e.target.closest('[data-act]'); if(!b) return;
     var id=b.closest('.va-rec').dataset.id, r=recById(id); if(!r) return;
     if(b.dataset.act==='del'){
-      if(!confirm('删除这条记录？\n'+(r.file_name||''))) return;
+      if(!confirm('删除这条记录？\n'+(r.file_name||'')+'\n（标注人：'+(r.annotator_name||'匿名')+'，V='+fmtV(+r.valence)+' A='+fmtV(+r.arousal)+'）\n\n删除后无法恢复，导出过的 CSV/备份不受影响。')) return;
       store.records=store.records.filter(function(x){ return x.record_id!==id; });
       if(editingId===id){ editingId=null; anchor=null; }
       save(); renderRecords(); refresh(); toast('已删除 '+id);
@@ -1734,6 +2108,11 @@ select.va-mini{padding:5px 4px;}
   function openModal(on){ $('vaKeys').classList.toggle('on',on); }
   $('vaKeysBtn').addEventListener('click',function(){ openModal(true); });
   $('vaKeysClose').addEventListener('click',function(){ openModal(false); });
+  /* ---------- 操作手册弹窗 ---------- */
+  function openHelp(on){ $('vaHelp').classList.toggle('on',on); }
+  $('vaHelpBtn').addEventListener('click',function(){ openHelp(true); });
+  $('vaHelpClose').addEventListener('click',function(){ openHelp(false); });
+  $('vaHelp').addEventListener('click',function(e){ if(e.target===this) openHelp(false); });   /* 点空白处关闭 */
 
   /* ---------- 键盘 ---------- */
   document.addEventListener('keydown',function(e){
@@ -1761,16 +2140,38 @@ select.va-mini{padding:5px 4px;}
     else if(e.key==='s'||e.key==='S') saveAndNext();
     else if(e.key==='r'||e.key==='R'){ if(audio.src){ audio.currentTime=0; audio.play().catch(function(){}); } }
     else if(e.key==='x'||e.key==='X') $('vaClearAnchor').click();
-    else if(e.key==='d'||e.key==='D'){ var c=$('vaRand'); c.checked=!c.checked; toast('随机发曲：'+(c.checked?'开':'关')); }
+    else if(e.key==='d'||e.key==='D'){ var c=$('vaRand'); c.checked=!c.checked; store.settings.rand=c.checked; save(); toast('随机发曲：'+(c.checked?'开':'关')); }
     else if(e.key==='?'||(e.key==='/'&&e.shiftKey)) openModal(true);
     else if(e.key==='Escape'){
       if($('vaKeys').classList.contains('on')) openModal(false);
+      else if($('vaHelp').classList.contains('on')) openHelp(false);
+      else if($('vaStressModal').classList.contains('on')) closeStressQuiz();
       else if(editingId) $('vaCancelEdit').click();
       else closeMenu();
     }
   });
   /* 点击按钮后移除焦点，避免空格键误触发上一次点击的按钮 */
   root.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&b!==document.activeElement) return; if(b) b.blur(); });
+
+  /* ---------- 多标签页同步 ----------
+     同一个文件开多个标签页时，每页各持一份内存数据，谁保存谁覆盖：旧标签页会把已删的记录
+     "复活"、或把新记录顶掉。监听 storage 事件：别的标签页一保存，本页立即跟进最新数据 */
+  window.addEventListener('storage',function(e){
+    if(e.key!==KEY||!e.newValue) return;
+    var p; try{ p=JSON.parse(e.newValue); }catch(err){ return; }
+    if(!p||typeof p!=='object') return;
+    store.records=p.records||[]; store.plays=p.plays||{};
+    store.drafts=p.drafts||{}; store.overrides=p.overrides||{};
+    store.queue=p.queue||[]; store.heard=p.heard||{};
+    store.lastExportAt=p.lastExportAt||0;
+    store.dedupDone=p.dedupDone; store.dedupRemoved=0;
+    store.settings=Object.assign(empty().settings,p.settings||{});
+    store.profile=Object.assign(empty().profile,p.profile||{});
+    if(!store.profile.stress) store.profile.stress={level:'',sources:[],note:'',pss:null};
+    heard=store.heard;
+    loadProfile(); loadSettings(); applyRecFold(); fillFix(); refresh();
+    toast('已同步其他标签页的最新数据');
+  });
 
   /* ---------- 启动 ---------- */
   /* 画布自适应：桌面端 JS 写显式边长（中栏其余元素占多少，画布就吃多少，整页不滚动）；
@@ -1810,7 +2211,7 @@ select.va-mini{padding:5px 4px;}
     else { window.addEventListener('resize',set); }
   })();
   loadProfile(); updateMbtiLink(); bindProfile();
-  loadSettings(); renderLikert();
+  loadSettings(); applyRecFold(); renderLikert();
   refresh(); fillFix(); sizeCanvas(); fitCanvas();
   restoreLib();
   if(window.ResizeObserver){ new ResizeObserver(sizeCanvas).observe(cv); } else { window.addEventListener('resize',sizeCanvas); }
